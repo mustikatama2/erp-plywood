@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal } from "../../components/ui";
+import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal, Tip, toast } from "../../components/ui";
 import { IDR, DATE, badge, exportCSV } from "../../lib/fmt";
 import { AR_INVOICES, CUSTOMERS } from "../../data/seed";
 
@@ -27,14 +27,14 @@ export default function AR() {
 
   return (
     <div>
-      <PageHeader title="Accounts Receivable" subtitle="Customer invoices & aging"
+      <PageHeader title="Piutang Dagang (AR)" subtitle="Invoice customer & status pembayaran"
         actions={<><Btn variant="secondary" onClick={()=>exportCSV(enriched.map(i=>({...i,customer:i.customer?.name})),"ar.csv")}>📤 Export</Btn><Btn>+ New Invoice</Btn></>} />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <KPICard label="Total AR Outstanding" value={IDR(total)}   color="text-amber-300" icon="📤" />
-        <KPICard label="Overdue"              value={IDR(overdue)} color="text-red-400"   icon="🔴" sub={`${enriched.filter(i=>i.status==="Overdue").length} invoices`} />
-        <KPICard label="Open Invoices"        value={enriched.filter(i=>i.status!=="Paid").length} icon="📄" />
-        <KPICard label="Customers with AR"    value={new Set(enriched.filter(i=>i.balance>0).map(i=>i.customer_id)).size} icon="👥" />
+        <KPICard label="Total Piutang" sublabel="AR Outstanding" value={IDR(total)} color="text-amber-300" icon="📤" />
+        <KPICard label="Sudah Jatuh Tempo" sublabel="Overdue" value={IDR(overdue)} color="text-red-400" icon="🔴" sub={`${enriched.filter(i=>i.status==="Overdue").length} invoice`} />
+        <KPICard label="Invoice Terbuka" sublabel="Open Invoices" value={enriched.filter(i=>i.status!=="Paid").length} icon="📄" />
+        <KPICard label="Jumlah Customer" sublabel="with balance" value={new Set(enriched.filter(i=>i.balance>0).map(i=>i.customer_id)).size} icon="👥" />
       </div>
 
       <Card>
@@ -84,8 +84,8 @@ export default function AR() {
             </div>
             <div className="flex justify-end gap-2">
               <Btn variant="secondary" onClick={()=>setSelected(null)}>Close</Btn>
-              <Btn variant="success">Record Payment</Btn>
-              <Btn variant="secondary">Send Reminder</Btn>
+              <Btn variant="success" onClick={()=>{toast("Pembayaran berhasil dicatat ✅","success");setSelected(null);}}>💰 Catat Pembayaran</Btn>
+              <Btn variant="secondary" onClick={()=>toast("Pengingat terkirim 📧","success")}>📧 Kirim Reminder</Btn>
             </div>
           </div>
         </Modal>

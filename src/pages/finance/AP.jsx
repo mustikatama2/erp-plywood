@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal } from "../../components/ui";
+import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal, toast } from "../../components/ui";
 import { IDR, DATE, badge } from "../../lib/fmt";
 import { AP_INVOICES, VENDORS } from "../../data/seed";
 
@@ -23,14 +23,14 @@ export default function AP() {
 
   return (
     <div>
-      <PageHeader title="Accounts Payable" subtitle="Vendor bills & payment schedule"
+      <PageHeader title="Hutang Dagang (AP)" subtitle="Tagihan vendor & jadwal pembayaran"
         actions={<><Btn variant="secondary">📤 Export</Btn><Btn>+ New Bill</Btn></>} />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <KPICard label="Total AP Outstanding" value={IDR(total)}   color="text-amber-300" icon="📥" />
-        <KPICard label="Overdue"              value={IDR(overdue)} color="text-red-400"   icon="🔴" />
-        <KPICard label="Open Bills"           value={enriched.filter(i=>i.status!=="Paid").length} icon="📄" />
-        <KPICard label="Vendors with AP"      value={new Set(enriched.filter(i=>i.balance>0).map(i=>i.vendor_id)).size} icon="🏢" />
+        <KPICard label="Total Hutang" sublabel="AP Outstanding" value={IDR(total)} color="text-amber-300" icon="📥" />
+        <KPICard label="Jatuh Tempo" sublabel="Overdue" value={IDR(overdue)} color="text-red-400" icon="🔴" />
+        <KPICard label="Tagihan Terbuka" sublabel="Open Bills" value={enriched.filter(i=>i.status!=="Paid").length} icon="📄" />
+        <KPICard label="Vendor Aktif" sublabel="with balance" value={new Set(enriched.filter(i=>i.balance>0).map(i=>i.vendor_id)).size} icon="🏢" />
       </div>
 
       <Card>
@@ -76,7 +76,7 @@ export default function AP() {
             </div>
             <div className="flex justify-end gap-2">
               <Btn variant="secondary" onClick={()=>setSelected(null)}>Close</Btn>
-              <Btn variant="success">Record Payment</Btn>
+              <Btn variant="success" onClick={()=>{toast("Pembayaran berhasil dicatat ✅");setSelected(null);}}>💳 Catat Pembayaran</Btn>
             </div>
           </div>
         </Modal>

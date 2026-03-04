@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Card, Btn, Badge, SearchBar, Table, Modal } from "../../components/ui";
+import { PageHeader, Card, Btn, Badge, SearchBar, Table, Modal, toast } from "../../components/ui";
 import { IDR, USD, DATE, badge, exportCSV } from "../../lib/fmt";
 import { SALES_ORDERS, CUSTOMERS, PRODUCTS } from "../../data/seed";
 
@@ -20,7 +20,7 @@ export default function SalesOrders() {
 
   return (
     <div>
-      <PageHeader title="Sales Orders" subtitle={`${orders.length} orders · ${orders.filter(o=>o.status!=="Shipped").length} open`}
+      <PageHeader title="Order Penjualan (Sales Orders)" subtitle={`${orders.length} order · ${orders.filter(o=>o.status!=="Shipped").length} aktif`}
         actions={<><Btn variant="secondary" onClick={()=>exportCSV(orders,"sales-orders.csv")}>📤 Export</Btn><Btn>+ New SO</Btn></>} />
 
       {/* Status strip */}
@@ -84,9 +84,9 @@ export default function SalesOrders() {
               </table>
             </div>
             <div className="flex gap-2 justify-end">
-              <Btn variant="secondary" onClick={()=>setSelected(null)}>Close</Btn>
-              <Btn variant="success">Create Proforma</Btn>
-              <Btn>Ship</Btn>
+              <Btn variant="secondary" onClick={()=>setSelected(null)}>Tutup</Btn>
+              <Btn variant="success" onClick={()=>{toast("Proforma Invoice dibuat 📋");setSelected(null);}}>📋 Buat Proforma</Btn>
+              <Btn onClick={()=>{toast("Order ditandai sebagai dikirim 🚢");setSelected(null);}}>🚢 Kirim</Btn>
             </div>
           </div>
         </Modal>

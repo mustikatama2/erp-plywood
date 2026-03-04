@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.animate-in.slide-in-from-right-2 { animation: slideInRight 0.25s ease-out; }
+
 body { @apply bg-gray-950 text-gray-100 text-sm; }
 
 /* Scrollbar */

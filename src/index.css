@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { @apply bg-gray-950 text-gray-100 text-sm; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #111827; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+/* Table */
+.erp-table { @apply w-full text-sm; }
+.erp-table thead tr { @apply border-b border-gray-800; }
+.erp-table thead th { @apply text-left px-4 py-2.5 text-xs font-bold text-gray-500 uppercase tracking-wider; }
+.erp-table tbody tr { @apply border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors; }
+.erp-table tbody td { @apply px-4 py-3 text-gray-300; }
+
+/* Input */
+.erp-input { @apply w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all; }
+.erp-select { @apply w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none; }
+.erp-label { @apply block text-xs font-medium text-gray-400 mb-1; }
+
+/* Card */
+.erp-card { @apply bg-gray-900 border border-gray-800 rounded-xl; }

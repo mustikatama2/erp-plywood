@@ -1,7 +1,149 @@
 import { useState } from "react";
 import { PageHeader, Card, Btn, Badge, SearchBar, Table, Modal, toast, FormField } from "../../components/ui";
 import { IDR, DATE, days_from_now, TODAY } from "../../lib/fmt";
-import { PURCHASE_ORDERS, VENDORS, PRODUCTS } from "../../data/seed";
+import { PURCHASE_ORDERS, VENDORS, PRODUCTS, COMPANY } from "../../data/seed";
+
+// ── Print PO Modal ────────────────────────────────────────────────────────────
+function PrintPOModal({ po, onClose }) {
+  const vendor = po.vendor || VENDORS.find(v => v.id === po.vendor_id);
+
+  const handlePrint = () => {
+    document.title = `PO ${po.po_no}`;
+    window.print();
+    document.title = "Mustikatama ERP";
+  };
+
+  return (
+    <Modal title={`Print Purchase Order — ${po.po_no}`} onClose={onClose} width="max-w-3xl">
+      <div className="p-4">
+        <div className="flex justify-end gap-2 mb-4 no-print">
+          <Btn variant="secondary" onClick={onClose}>✕ Tutup</Btn>
+          <Btn className="print-show" onClick={handlePrint}>🖨️ Print</Btn>
+        </div>
+
+        {/* A4 document */}
+        <div className="print-doc print-area bg-white border border-gray-200 rounded-lg p-8">
+          {/* Letterhead */}
+          <div className="flex items-start justify-between mb-6 pb-4 border-b-2 border-gray-800">
+            <div>
+              <h1 className="text-xl font-black text-gray-900" style={{fontFamily:"Georgia,serif"}}>
+                PT. MUSTIKATAMA GRAHA PERSADA
+              </h1>
+              <p className="text-xs text-gray-600 mt-1">Jl. Industri Raya No. 12, Kawasan Industri, Bekasi 17520</p>
+              <p className="text-xs text-gray-600">NPWP: 01.234.567.8-091.000</p>
+              <p className="text-xs text-gray-600">Telp: (021) 8840-1234 · Email: purchasing@mustikatama.co.id</p>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Document Type</div>
+              <h2 className="text-2xl font-black text-gray-800 border-2 border-gray-800 px-3 py-1">PURCHASE ORDER</h2>
+            </div>
+          </div>
+
+          {/* PO meta */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="space-y-1 text-sm">
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Vendor / Supplier</p>
+              <p className="font-bold text-gray-900 text-base">{vendor?.name || "—"}</p>
+              <p className="text-gray-700">{vendor?.country || vendor?.address || "—"}</p>
+              {vendor?.contact_person && <p className="text-gray-600">Attn: {vendor.contact_person}</p>}
+            </div>
+            <div className="space-y-1 text-sm border-l border-gray-200 pl-6">
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">PO Details</p>
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">PO Number:</span>
+                  <span className="font-mono font-bold text-gray-900">{po.po_no}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">PO Date:</span>
+                  <span className="font-medium text-gray-900">{DATE(po.date)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Delivery Date:</span>
+                  <span className="font-medium text-gray-900">{DATE(po.delivery_date)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Status:</span>
+                  <Badge status={po.status} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Items table */}
+          <table className="w-full text-sm mb-6 border border-gray-300">
+            <thead>
+              <tr className="bg-gray-800 text-white">
+                <th className="text-left px-3 py-2 text-xs uppercase tracking-wider">No.</th>
+                <th className="text-left px-3 py-2 text-xs uppercase tracking-wider">Deskripsi / Produk</th>
+                <th className="text-right px-3 py-2 text-xs uppercase tracking-wider">Qty</th>
+                <th className="text-right px-3 py-2 text-xs uppercase tracking-wider">Satuan</th>
+                <th className="text-right px-3 py-2 text-xs uppercase tracking-wider">Harga Satuan</th>
+                <th className="text-right px-3 py-2 text-xs uppercase tracking-wider">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(po.lines || []).map((line, i) => (
+                <tr key={i} className="border-b border-gray-200">
+                  <td className="px-3 py-2 text-gray-600">{i + 1}</td>
+                  <td className="px-3 py-2 text-gray-900">{line.product || "—"}</td>
+                  <td className="px-3 py-2 text-right">{Number(line.qty).toLocaleString()}</td>
+                  <td className="px-3 py-2 text-right text-gray-600">{line.unit || "pcs"}</td>
+                  <td className="px-3 py-2 text-right font-mono">{IDR(line.unit_price)}</td>
+                  <td className="px-3 py-2 text-right font-mono font-bold">{IDR(line.total || (line.qty * line.unit_price))}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-gray-800 bg-gray-800 text-white">
+                <td colSpan={5} className="px-3 py-2 text-right font-black uppercase tracking-wider text-sm">Total</td>
+                <td className="px-3 py-2 text-right font-mono font-black text-base">{IDR(po.total)}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          {/* Payment terms & notes */}
+          <div className="grid grid-cols-2 gap-6 mt-4 text-sm border-t border-gray-200 pt-4">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Syarat Pembayaran / Payment Terms</p>
+              <p className="text-gray-700">Net 30 hari sejak penerimaan barang</p>
+              {po.notes && (
+                <div className="mt-2">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Catatan</p>
+                  <p className="text-gray-600 italic">{po.notes}</p>
+                </div>
+              )}
+            </div>
+            <div className="border-l border-gray-200 pl-6">
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Pengiriman / Delivery</p>
+              <p className="text-gray-700">Kirim ke: Gudang PT. Mustikatama Graha Persada</p>
+              <p className="text-gray-700">Jl. Industri Raya No. 12, Bekasi 17520</p>
+              <p className="text-gray-600 text-xs mt-1">Hubungi gudang sebelum pengiriman: (021) 8840-1235</p>
+            </div>
+          </div>
+
+          {/* Signature block */}
+          <div className="mt-8 grid grid-cols-2 gap-8 text-sm text-center">
+            <div>
+              <p className="text-xs text-gray-500 mb-8">Dibuat Oleh / Prepared By</p>
+              <div className="border-t border-gray-800 pt-2">
+                <p className="font-medium text-gray-800">Purchasing Dept.</p>
+                <p className="text-xs text-gray-500">PT. Mustikatama Graha Persada</p>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-8">Disetujui Oleh / Approved By</p>
+              <div className="border-t border-gray-800 pt-2">
+                <p className="font-medium text-gray-800">Purchasing Manager</p>
+                <p className="text-xs text-gray-500">PT. Mustikatama Graha Persada</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
 
 const BLANK_LINE = { product:"", qty:"", unit:"pcs", unit_price:"" };
 
@@ -10,6 +152,7 @@ export default function PurchaseOrders() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showPrint, setShowPrint] = useState(false);
   const [form, setForm] = useState({ vendor_id:"", delivery_date:days_from_now(14), notes:"", lines:[{...BLANK_LINE}] });
   const [errors, setErrors] = useState({});
 
@@ -102,8 +245,9 @@ export default function PurchaseOrders() {
                 </tr></tfoot>
               </table>
             </div>
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 flex-wrap">
               <Btn variant="secondary" onClick={()=>setSelected(null)}>Tutup</Btn>
+              <Btn variant="secondary" onClick={()=>setShowPrint(true)}>🖨️ Print PO</Btn>
               <Btn variant="success" onClick={()=>{
                 setOrders(os=>os.map(o=>o.id===selected.id?{...o,status:"Received"}:o));
                 setSelected(null); toast("Barang ditandai sudah diterima 📦");
@@ -115,6 +259,13 @@ export default function PurchaseOrders() {
             </div>
           </div>
         </Modal>
+      )}
+
+      {showPrint && selected && (
+        <PrintPOModal
+          po={{ ...selected, vendor: VENDORS.find(v => v.id === selected.vendor_id) }}
+          onClose={() => setShowPrint(false)}
+        />
       )}
 
       {showForm && (

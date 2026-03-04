@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { MDMProvider } from "./contexts/MDMContext";
 import { JournalProvider } from "./contexts/JournalContext";
+import { ActivityProvider } from "./contexts/ActivityContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
@@ -30,10 +31,12 @@ import ChartOfAccounts  from "./pages/settings/ChartOfAccounts";
 import CompanySettings  from "./pages/settings/CompanySettings";
 import AIAssistant      from "./pages/ai/AIAssistant";
 import MDMQueue         from "./pages/admin/MDMQueue";
+import ActivityLog      from "./pages/admin/ActivityLog";
 import Biaya            from "./pages/finance/Biaya";
 import Costing          from "./pages/production/Costing";
 import InventoryReport  from "./pages/inventory/InventoryReport";
 import LC               from "./pages/finance/LC";
+import SVLK             from "./pages/finance/SVLK";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -82,8 +85,11 @@ function AppRoutes() {
             <Route path="/settings/company"    element={<ProtectedRoute><CompanySettings /></ProtectedRoute>} />
             {/* AI */}
             <Route path="/ai"                  element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
+            {/* Compliance */}
+            <Route path="/compliance/svlk"     element={<ProtectedRoute><SVLK /></ProtectedRoute>} />
             {/* Admin */}
             <Route path="/admin/mdm"           element={<ProtectedRoute allowedRoles={["admin"]}><MDMQueue /></ProtectedRoute>} />
+            <Route path="/admin/activity"      element={<ProtectedRoute allowedRoles={["admin"]}><ActivityLog /></ProtectedRoute>} />
             <Route path="*"                    element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
@@ -97,7 +103,9 @@ export default function App() {
     <AuthProvider>
       <JournalProvider>
         <MDMProvider>
-          <AppRoutes />
+          <ActivityProvider>
+            <AppRoutes />
+          </ActivityProvider>
         </MDMProvider>
       </JournalProvider>
     </AuthProvider>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { ToastProvider } from "./ui";
+import { ToastProvider, toast } from "./ui";
 import { useAuth } from "../contexts/AuthContext";
 import { useMDM } from "../contexts/MDMContext";
 import { canApproveMDM } from "../lib/mdm";
@@ -36,7 +36,10 @@ const NAV = [
     { to:"/finance/ledger",      icon:"📒", label:"Ledger",            bi:"Buku Besar"        },
     { to:"/finance/reports",     icon:"📈", label:"Reports",           bi:"Laporan Keuangan"  },
     { to:"/finance/biaya",       icon:"📆", label:"Prepaid Expenses",  bi:"Biaya Dibayar Muka"},
-    { to:"/finance/lc",          icon:"🏦", label:"LC Tracker",         bi:"Letter of Credit"  },
+  ]},
+  { label:"Kepatuhan",  items:[
+    { to:"/finance/lc",          icon:"🏦", label:"LC Tracker",        bi:"Letter of Credit"  },
+    { to:"/compliance/svlk",     icon:"📜", label:"SVLK Tracker",      bi:"Sertifikat SVLK"   },
   ]},
   { label:"Operasional",items:[
     { to:"/production",          icon:"🏭", label:"Production",        bi:"Produksi"          },
@@ -50,6 +53,7 @@ const NAV = [
   ]},
   { label:"Admin",      items:[
     { to:"/admin/mdm",           icon:"🗂️", label:"MDM Queue",         bi:"Antrian Data Induk", adminOnly: true },
+    { to:"/admin/activity",      icon:"📋", label:"Activity Log",      bi:"Log Aktivitas",      adminOnly: true },
   ]},
   { label:"Pengaturan", items:[
     { to:"/settings/coa",        icon:"📑", label:"Chart of Accounts", bi:"Daftar Akun"       },
@@ -69,6 +73,49 @@ function LiveClock() {
   );
 }
 
+// ── Keyboard Help Modal ───────────────────────────────────────────────────────
+function KeyboardHelp({ onClose }) {
+  const shortcuts = [
+    { keys: ["⌘", "K"],  desc: "Global Search — cari apa saja" },
+    { keys: ["⌘", "N"],  desc: "Buat record baru (context-aware)" },
+    { keys: ["⌘", "/"],  desc: "Tampilkan daftar keyboard shortcuts" },
+    { keys: ["ESC"],     desc: "Tutup modal yang sedang terbuka" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 className="font-bold text-gray-900">⌨️ Keyboard Shortcuts</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Shortcut untuk navigasi cepat</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl font-bold">×</button>
+        </div>
+        <div className="p-6 space-y-3">
+          {shortcuts.map((s, i) => (
+            <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+              <span className="text-sm text-gray-700">{s.desc}</span>
+              <div className="flex items-center gap-1">
+                {s.keys.map((k, j) => (
+                  <kbd key={j} className="inline-flex items-center px-2 py-1 text-xs font-mono font-bold bg-gray-100 border border-gray-300 rounded-md text-gray-700 shadow-sm">
+                    {k}
+                  </kbd>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-6 pb-4 flex justify-end">
+          <button onClick={onClose} className="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-700 transition-colors">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LayoutInner({ children }) {
   const { user, role, logout, can } = useAuth();
   const { pendingCount } = useMDM();
@@ -76,11 +123,49 @@ function LayoutInner({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = canApproveMDM(user?.role);
 
   useEffect(() => setMobileOpen(false), [location.pathname]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e) => {
+      const meta = e.metaKey || e.ctrlKey;
+      if (!meta) return;
+
+      // ⌘K — Global Search (handled by GlobalSearch context)
+      if (e.key === "k") {
+        e.preventDefault();
+        openSearch(true);
+        return;
+      }
+
+      // ⌘N — Context-aware new record
+      if (e.key === "n") {
+        e.preventDefault();
+        const path = location.pathname;
+        if (path === "/sales/orders")    { navigate("/sales/orders?new=1");    return; }
+        if (path === "/finance/ar")      { navigate("/finance/ar?new=1");      return; }
+        if (path === "/finance/ap")      { navigate("/finance/ap?new=1");      return; }
+        if (path === "/hr/employees")    { navigate("/hr/employees?new=1");    return; }
+        if (path === "/purchasing/orders") { navigate("/purchasing/orders?new=1"); return; }
+        toast("Gunakan tombol + di halaman ini", "info");
+        return;
+      }
+
+      // ⌘/ — Keyboard shortcuts help
+      if (e.key === "/") {
+        e.preventDefault();
+        setShowKeyboardHelp(prev => !prev);
+        return;
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [location.pathname, navigate, openSearch]);
 
   // Filter nav items the current user can access
   const filteredNav = NAV.map(group => ({
@@ -277,6 +362,7 @@ function LayoutInner({ children }) {
       </div>
 
       <ToastProvider />
+      {showKeyboardHelp && <KeyboardHelp onClose={() => setShowKeyboardHelp(false)} />}
     </div>
   );
 }

@@ -2,9 +2,160 @@ import { useState, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from "recharts";
 import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal, FormField, Divider, toast } from "../../components/ui";
 import { IDR, DATE, exportCSV } from "../../lib/fmt";
-import { AR_INVOICES, CUSTOMERS, SALES_ORDERS, SHIPMENTS } from "../../data/seed";
+import { AR_INVOICES, CUSTOMERS, SALES_ORDERS, SHIPMENTS, COMPANY } from "../../data/seed";
 import { useJournal } from "../../contexts/JournalContext";
 import DocumentTrail from "../../components/DocumentTrail";
+
+// ── Print Invoice Modal ───────────────────────────────────────────────────────
+function PrintInvoiceModal({ invoice, onClose }) {
+  const customer = invoice.customer || CUSTOMERS.find(c => c.id === invoice.customer_id);
+  const shipment = SHIPMENTS.find(s => s.so_id === invoice.so_id);
+
+  const handlePrint = () => {
+    document.title = `Invoice ${invoice.inv_no}`;
+    window.print();
+    document.title = "Mustikatama ERP";
+  };
+
+  return (
+    <Modal title={`Print Invoice — ${invoice.inv_no}`} onClose={onClose} width="max-w-3xl">
+      <div className="p-4">
+        <div className="flex justify-end gap-2 mb-4 no-print">
+          <Btn variant="secondary" onClick={onClose}>✕ Tutup</Btn>
+          <Btn className="print-show" onClick={handlePrint}>🖨️ Print</Btn>
+        </div>
+
+        {/* A4 document */}
+        <div className="print-doc print-area bg-white border border-gray-200 rounded-lg p-8" id="print-invoice">
+          {/* Letterhead */}
+          <div className="flex items-start justify-between mb-6 pb-4 border-b-2 border-gray-800">
+            <div>
+              <h1 className="text-xl font-black text-gray-900" style={{fontFamily:"Georgia,serif"}}>
+                PT. MUSTIKATAMA GRAHA PERSADA
+              </h1>
+              <p className="text-xs text-gray-600 mt-1">Jl. Industri Raya No. 12, Kawasan Industri, Bekasi 17520</p>
+              <p className="text-xs text-gray-600">NPWP: 01.234.567.8-091.000</p>
+              <p className="text-xs text-gray-600">Telp: (021) 8840-1234 · Email: export@mustikatama.co.id</p>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Document Type</div>
+              <h2 className="text-2xl font-black text-gray-800 border-2 border-gray-800 px-3 py-1">COMMERCIAL INVOICE</h2>
+            </div>
+          </div>
+
+          {/* Invoice meta */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="space-y-1 text-sm">
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Bill To</p>
+              <p className="font-bold text-gray-900 text-base">{customer?.name || "—"}</p>
+              <p className="text-gray-700">{customer?.country || "—"}</p>
+              {customer?.contact_person && <p className="text-gray-600">Attn: {customer.contact_person}</p>}
+            </div>
+            {shipment && (
+              <div className="space-y-1 text-sm border-l border-gray-200 pl-6">
+                <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Ship To</p>
+                <p className="text-gray-700">Port of Discharge: <strong>{shipment.port_discharge}</strong></p>
+                <p className="text-gray-700">B/L No: <strong className="font-mono">{shipment.bl_no}</strong></p>
+                {shipment.vessel && <p className="text-gray-700">Vessel: {shipment.vessel}</p>}
+              </div>
+            )}
+          </div>
+
+          {/* Invoice details box */}
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 grid grid-cols-3 gap-4 text-sm">
+            <div><p className="text-xs text-gray-500 uppercase">Invoice No.</p><p className="font-mono font-bold text-gray-900">{invoice.inv_no}</p></div>
+            <div><p className="text-xs text-gray-500 uppercase">Invoice Date</p><p className="font-medium text-gray-900">{DATE(invoice.date)}</p></div>
+            <div><p className="text-xs text-gray-500 uppercase">Due Date</p><p className="font-medium text-gray-900">{DATE(invoice.due_date)}</p></div>
+          </div>
+
+          {/* Items table */}
+          <table className="w-full text-sm mb-6 border border-gray-300">
+            <thead>
+              <tr className="bg-gray-800 text-white">
+                <th className="text-left px-3 py-2 text-xs uppercase tracking-wider">No.</th>
+                <th className="text-left px-3 py-2 text-xs uppercase tracking-wider">Description</th>
+                <th className="text-right px-3 py-2 text-xs uppercase tracking-wider">Qty</th>
+                <th className="text-right px-3 py-2 text-xs uppercase tracking-wider">Unit</th>
+                <th className="text-right px-3 py-2 text-xs uppercase tracking-wider">Unit Price</th>
+                <th className="text-right px-3 py-2 text-xs uppercase tracking-wider">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(invoice.lines && invoice.lines.length > 0) ? (
+                invoice.lines.map((line, i) => (
+                  <tr key={i} className="border-b border-gray-200">
+                    <td className="px-3 py-2 text-gray-600">{i + 1}</td>
+                    <td className="px-3 py-2 text-gray-900">{line.desc || line.product || "—"}</td>
+                    <td className="px-3 py-2 text-right">{Number(line.qty).toLocaleString()}</td>
+                    <td className="px-3 py-2 text-right text-gray-600">{line.unit || "pcs"}</td>
+                    <td className="px-3 py-2 text-right font-mono">{invoice.currency} {Number(line.unit_price).toLocaleString()}</td>
+                    <td className="px-3 py-2 text-right font-mono font-bold">{invoice.currency} {(Number(line.qty) * Number(line.unit_price)).toLocaleString()}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="px-3 py-2 text-gray-600">1</td>
+                  <td className="px-3 py-2 text-gray-900">Plywood Export</td>
+                  <td className="px-3 py-2 text-right">—</td>
+                  <td className="px-3 py-2 text-right text-gray-600">—</td>
+                  <td className="px-3 py-2 text-right font-mono">—</td>
+                  <td className="px-3 py-2 text-right font-mono font-bold">{invoice.currency} {invoice.total.toLocaleString()}</td>
+                </tr>
+              )}
+            </tbody>
+            <tfoot>
+              <tr className="border-t border-gray-300 bg-gray-50">
+                <td colSpan={5} className="px-3 py-2 text-right font-medium text-gray-700">Subtotal</td>
+                <td className="px-3 py-2 text-right font-mono font-bold">{invoice.currency} {invoice.subtotal?.toLocaleString() ?? invoice.total.toLocaleString()}</td>
+              </tr>
+              {invoice.tax > 0 && (
+                <tr className="border-t border-gray-200">
+                  <td colSpan={5} className="px-3 py-2 text-right text-gray-600">PPN / Tax (11%)</td>
+                  <td className="px-3 py-2 text-right font-mono">{invoice.currency} {invoice.tax.toLocaleString()}</td>
+                </tr>
+              )}
+              <tr className="border-t-2 border-gray-800 bg-gray-800 text-white">
+                <td colSpan={5} className="px-3 py-2 text-right font-black uppercase tracking-wider text-sm">Total</td>
+                <td className="px-3 py-2 text-right font-mono font-black text-base">{invoice.currency} {invoice.total.toLocaleString()}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          {/* Payment terms & bank details */}
+          <div className="grid grid-cols-2 gap-6 mt-6 text-sm border-t border-gray-200 pt-4">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Payment Terms</p>
+              <p className="text-gray-700">T/T Bank Transfer · Net 30 days</p>
+              {invoice.notes && <p className="text-gray-500 mt-1 italic">{invoice.notes}</p>}
+            </div>
+            <div className="border-l border-gray-200 pl-6">
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Bank Details</p>
+              <p className="text-gray-700">Bank BCA · Acc No: 123-456-7890</p>
+              <p className="text-gray-700">Bank Mandiri · Acc No: 987-654-3210</p>
+              <p className="text-gray-600 text-xs mt-1">SWIFT/BIC: CENAIDJA / BMRIIDJA</p>
+            </div>
+          </div>
+
+          {/* Signature block */}
+          <div className="mt-8 grid grid-cols-2 gap-8 text-sm text-center">
+            <div>
+              <p className="text-xs text-gray-500 mb-8">Dibuat Oleh / Prepared By</p>
+              <div className="border-t border-gray-800 pt-2">
+                <p className="font-medium text-gray-800">PT. Mustikatama Graha Persada</p>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-8">Disetujui Oleh / Approved By</p>
+              <div className="border-t border-gray-800 pt-2">
+                <p className="font-medium text-gray-800">Finance Director</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
 
 // ── AR Aging Analysis ─────────────────────────────────────────────────────────
 function AgingBuckets({ invoices, customers }) {
@@ -336,6 +487,7 @@ export default function AR() {
   const [selected, setSelected]       = useState(null);
   const [showNew, setShowNew]         = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [showPrint, setShowPrint]     = useState(false);
   const [localInvoices, setLocalInvoices] = useState([]);
   const [overrides, setOverrides]     = useState({}); // id → partial overrides
   const [showAging, setShowAging]     = useState(false);
@@ -456,6 +608,7 @@ export default function AR() {
             })()}
             <div className="flex justify-end gap-2">
               <Btn variant="secondary" onClick={() => setSelected(null)}>Close</Btn>
+              <Btn variant="secondary" onClick={() => setShowPrint(true)}>🖨️ Print Invoice</Btn>
               {selectedEnriched.balance > 0 && (
                 <Btn variant="success" onClick={() => setShowPayment(true)}>💰 Catat Pembayaran</Btn>
               )}
@@ -483,6 +636,13 @@ export default function AR() {
             journal.postAR(inv, customer, shipment?.bl_no || null, inv.so_id || null);
           }}
           invoices={allInvoices}
+        />
+      )}
+
+      {showPrint && selectedEnriched && (
+        <PrintInvoiceModal
+          invoice={selectedEnriched}
+          onClose={() => setShowPrint(false)}
         />
       )}
     </div>

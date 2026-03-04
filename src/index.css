@@ -203,3 +203,25 @@ select.erp-input {
   border-radius: 0.75rem;
   color: #1E3A8A;
 }
+
+/* ── Print styles ─────────────────────────────────────────────────────────── */
+@media print {
+  /* Hide navigation, sidebar, topbar, buttons */
+  aside, header, .no-print, [class*="sidebar"], [class*="topbar"],
+  button:not(.print-show), nav { display: none !important; }
+
+  /* Reset background for print */
+  body, .erp-card { background: white !important; color: black !important; border: none !important; box-shadow: none !important; }
+
+  /* Print document area takes full width */
+  main, .print-area { padding: 0 !important; margin: 0 !important; }
+  .print-doc { max-width: 100% !important; }
+
+  /* Page breaks */
+  .page-break { page-break-before: always; }
+  .no-break { page-break-inside: avoid; }
+
+  /* Print typography */
+  body { font-size: 11pt; }
+  h1, h2 { color: black !important; }
+}

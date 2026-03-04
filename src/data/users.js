@@ -14,14 +14,14 @@ export const ROLES = {
     labelBI: "Keuangan / Akuntansi",
     color: "bg-green-500/20 text-green-300",
     description: "Laporan keuangan, piutang, hutang, bank, buku besar",
-    allowedPaths: ["/", "/finance", "/inventory/products", "/inventory/stock"],
+    allowedPaths: ["/", "/finance", "/compliance", "/inventory/products", "/inventory/stock"],
   },
   sales: {
     label: "Sales",
     labelBI: "Penjualan / Ekspor",
     color: "bg-blue-500/20 text-blue-300",
     description: "Customer, order penjualan, proforma invoice, pengiriman",
-    allowedPaths: ["/", "/sales", "/inventory/products", "/inventory/stock"],
+    allowedPaths: ["/", "/sales", "/compliance", "/inventory/products", "/inventory/stock"],
   },
   purchasing: {
     label: "Purchasing",

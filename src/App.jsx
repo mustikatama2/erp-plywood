@@ -1,5 +1,9 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/auth/Login";
+
 import Dashboard        from "./pages/dashboard/Dashboard";
 import Customers        from "./pages/sales/Customers";
 import SalesOrders      from "./pages/sales/SalesOrders";
@@ -23,42 +27,52 @@ import Assets           from "./pages/operations/Assets";
 import ChartOfAccounts  from "./pages/settings/ChartOfAccounts";
 import CompanySettings  from "./pages/settings/CompanySettings";
 
-const Stub = ({ name }) => (
-  <div className="text-center py-24 text-gray-500">
-    <p className="text-5xl mb-3">🚧</p>
-    <p className="text-lg font-bold text-gray-400">{name}</p>
-    <p className="text-sm mt-1">Module in development</p>
-  </div>
-);
+function AppRoutes() {
+  const { user } = useAuth();
+
+  return (
+    <Routes>
+      {/* Public */}
+      <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+
+      {/* Protected — all inside Layout */}
+      <Route path="/*" element={
+        <Layout>
+          <Routes>
+            <Route path="/"                    element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/sales/customers"     element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+            <Route path="/sales/orders"        element={<ProtectedRoute><SalesOrders /></ProtectedRoute>} />
+            <Route path="/sales/proforma"      element={<ProtectedRoute><ProformaInvoices /></ProtectedRoute>} />
+            <Route path="/sales/shipments"     element={<ProtectedRoute><Shipments /></ProtectedRoute>} />
+            <Route path="/purchasing/vendors"  element={<ProtectedRoute><Vendors /></ProtectedRoute>} />
+            <Route path="/purchasing/orders"   element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
+            <Route path="/purchasing/receipts" element={<ProtectedRoute><GoodsReceipts /></ProtectedRoute>} />
+            <Route path="/inventory/products"  element={<ProtectedRoute><Products /></ProtectedRoute>} />
+            <Route path="/inventory/stock"     element={<ProtectedRoute><StockLevels /></ProtectedRoute>} />
+            <Route path="/inventory/movements" element={<ProtectedRoute><Movements /></ProtectedRoute>} />
+            <Route path="/finance/ar"          element={<ProtectedRoute><AR /></ProtectedRoute>} />
+            <Route path="/finance/ap"          element={<ProtectedRoute><AP /></ProtectedRoute>} />
+            <Route path="/finance/banks"       element={<ProtectedRoute><Banks /></ProtectedRoute>} />
+            <Route path="/finance/ledger"      element={<ProtectedRoute><Ledger /></ProtectedRoute>} />
+            <Route path="/finance/reports"     element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/production"          element={<ProtectedRoute><Production /></ProtectedRoute>} />
+            <Route path="/hr/employees"        element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+            <Route path="/hr/payroll"          element={<ProtectedRoute><Payroll /></ProtectedRoute>} />
+            <Route path="/assets"              element={<ProtectedRoute><Assets /></ProtectedRoute>} />
+            <Route path="/settings/coa"        element={<ProtectedRoute><ChartOfAccounts /></ProtectedRoute>} />
+            <Route path="/settings/company"    element={<ProtectedRoute><CompanySettings /></ProtectedRoute>} />
+            <Route path="*"                    element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
+      } />
+    </Routes>
+  );
+}
 
 export default function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/"                    element={<Dashboard />} />
-        <Route path="/alerts"              element={<Stub name="Alerts" />} />
-        <Route path="/sales/customers"     element={<Customers />} />
-        <Route path="/sales/orders"        element={<SalesOrders />} />
-        <Route path="/sales/proforma"      element={<ProformaInvoices />} />
-        <Route path="/sales/shipments"     element={<Shipments />} />
-        <Route path="/purchasing/vendors"  element={<Vendors />} />
-        <Route path="/purchasing/orders"   element={<PurchaseOrders />} />
-        <Route path="/purchasing/receipts" element={<GoodsReceipts />} />
-        <Route path="/inventory/products"  element={<Products />} />
-        <Route path="/inventory/stock"     element={<StockLevels />} />
-        <Route path="/inventory/movements" element={<Movements />} />
-        <Route path="/finance/ar"          element={<AR />} />
-        <Route path="/finance/ap"          element={<AP />} />
-        <Route path="/finance/banks"       element={<Banks />} />
-        <Route path="/finance/ledger"      element={<Ledger />} />
-        <Route path="/finance/reports"     element={<Reports />} />
-        <Route path="/production"          element={<Production />} />
-        <Route path="/hr/employees"        element={<Employees />} />
-        <Route path="/hr/payroll"          element={<Payroll />} />
-        <Route path="/assets"              element={<Assets />} />
-        <Route path="/settings/coa"        element={<ChartOfAccounts />} />
-        <Route path="/settings/company"    element={<CompanySettings />} />
-      </Routes>
-    </Layout>
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }

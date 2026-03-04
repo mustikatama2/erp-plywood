@@ -6,9 +6,9 @@ import { PNL_MONTHLY, BALANCE_SHEET } from "../../data/seed";
 
 const TT = { contentStyle:{background:"#111827",border:"1px solid #374151",borderRadius:8}, labelStyle:{color:"#f3f4f6"} };
 
-function PnLReport() {
-  const cur = PNL_MONTHLY[PNL_MONTHLY.length-1];
-  const ytd = PNL_MONTHLY.reduce((a,m)=>({
+function PnLReport({ data = PNL_MONTHLY }) {
+  const cur = data[data.length-1] || PNL_MONTHLY[PNL_MONTHLY.length-1];
+  const ytd = data.reduce((a,m)=>({
     revenue:a.revenue+m.revenue, cogs:a.cogs+m.cogs, gross:a.gross+m.gross,
     opex:a.opex+m.opex, ebitda:a.ebitda+m.ebitda, net:a.net+m.net
   }), {revenue:0,cogs:0,gross:0,opex:0,ebitda:0,net:0});
@@ -28,7 +28,7 @@ function PnLReport() {
       {/* Monthly trend */}
       <Card title="Revenue & Profit Trend (Rp Juta)">
         <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={PNL_MONTHLY.map(m=>({
+          <LineChart data={data.map(m=>({
             month:m.month.slice(0,3), rev:Math.round(m.revenue/1e6), gross:Math.round(m.gross/1e6), net:Math.round(m.net/1e6)
           }))}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1f2937"/>
@@ -67,7 +67,7 @@ function PnLReport() {
           <table className="erp-table">
             <thead><tr><th>Month</th><th className="text-right">Revenue</th><th className="text-right">Gross Profit</th><th className="text-right">GPM</th><th className="text-right">Net Income</th><th className="text-right">NPM</th></tr></thead>
             <tbody>
-              {PNL_MONTHLY.map(m=>(
+              {data.map(m=>(
                 <tr key={m.month}>
                   <td className="font-medium">{m.month}</td>
                   <td className="text-right font-mono">{IDR(m.revenue)}</td>
@@ -136,9 +136,9 @@ function BalanceSheetReport() {
   );
 }
 
-function KPIReport() {
-  const cur  = PNL_MONTHLY[PNL_MONTHLY.length-1];
-  const prev = PNL_MONTHLY[PNL_MONTHLY.length-2];
+function KPIReport({ data = PNL_MONTHLY }) {
+  const cur  = data[data.length-1]  || PNL_MONTHLY[PNL_MONTHLY.length-1];
+  const prev = data[data.length-2]  || PNL_MONTHLY[PNL_MONTHLY.length-2];
   const trend = (a,b) => ((a-b)/b*100).toFixed(1);
   const bs = BALANCE_SHEET;
   const totalAssets = Object.values(bs.assets).reduce((a,b)=>a+b,0);
@@ -168,8 +168,79 @@ function KPIReport() {
   );
 }
 
+// ── Period Picker ─────────────────────────────────────────────────────────────
+
+const PRESETS = [
+  { key:"1m",  label:"Bulan Ini" },
+  { key:"3m",  label:"3 Bulan"   },
+  { key:"6m",  label:"6 Bulan"   },
+  { key:"ytd", label:"YTD 2026"  },
+  { key:"all", label:"Semua Data"},
+];
+
+function PeriodPicker({ preset, onPreset, startMonth, endMonth, onStartMonth, onEndMonth }) {
+  const months = PNL_MONTHLY.map(m => m.month);
+  return (
+    <div className="flex items-center gap-2 flex-wrap">
+      {/* Preset buttons */}
+      <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--bg-input)', border: '1px solid var(--border-light)' }}>
+        {PRESETS.map(p => (
+          <button key={p.key} onClick={() => onPreset(p.key)}
+            className={`px-2.5 py-1 text-xs rounded font-medium transition-colors ${
+              preset === p.key ? "text-gray-950 font-bold" : "text-gray-400 hover:text-gray-200"
+            }`}
+            style={preset === p.key ? { background: 'var(--gold)' } : {}}>
+            {p.label}
+          </button>
+        ))}
+      </div>
+      {/* Manual range */}
+      <div className="flex items-center gap-1.5">
+        <select value={startMonth} onChange={e => { onPreset("custom"); onStartMonth(e.target.value); }}
+          className="erp-select text-xs py-1.5 w-auto min-w-0" style={{ paddingRight: 28 }}>
+          {months.map(m => <option key={m} value={m}>{m}</option>)}
+        </select>
+        <span className="text-gray-600 text-xs">→</span>
+        <select value={endMonth} onChange={e => { onPreset("custom"); onEndMonth(e.target.value); }}
+          className="erp-select text-xs py-1.5 w-auto min-w-0" style={{ paddingRight: 28 }}>
+          {months.map(m => <option key={m} value={m}>{m}</option>)}
+        </select>
+      </div>
+    </div>
+  );
+}
+
+function filterByPeriod(data, preset, startMonth, endMonth) {
+  const all = data;
+  const idx = (m) => all.findIndex(x => x.month === m);
+  if (preset === "1m") return all.slice(-1);
+  if (preset === "3m") return all.slice(-3);
+  if (preset === "6m") return all.slice(-6);
+  if (preset === "ytd") return all.filter(m => m.month.includes("2026"));
+  if (preset === "custom") {
+    const s = idx(startMonth), e = idx(endMonth);
+    if (s < 0 || e < 0) return all;
+    return s <= e ? all.slice(s, e + 1) : all.slice(e, s + 1);
+  }
+  return all;
+}
+
 export default function Reports() {
   const [tab, setTab] = useState("pnl");
+  const [preset, setPreset] = useState("6m");
+  const [startMonth, setStartMonth] = useState(PNL_MONTHLY[0]?.month || "");
+  const [endMonth,   setEndMonth]   = useState(PNL_MONTHLY[PNL_MONTHLY.length-1]?.month || "");
+
+  const handlePreset = (p) => {
+    setPreset(p);
+    if (p !== "custom") {
+      setStartMonth(PNL_MONTHLY[0]?.month);
+      setEndMonth(PNL_MONTHLY[PNL_MONTHLY.length-1]?.month);
+    }
+  };
+
+  const filteredData = filterByPeriod(PNL_MONTHLY, preset, startMonth, endMonth);
+
   const TABS = [
     { key:"pnl",     label:"P&L Statement",  icon:"📈" },
     { key:"bs",      label:"Balance Sheet",   icon:"⚖️" },
@@ -178,22 +249,39 @@ export default function Reports() {
 
   return (
     <div>
-      <PageHeader title="Financial Reports" subtitle="Real-time — no month-end close"
-        actions={<Btn variant="secondary">📤 Export All</Btn>} />
+      <PageHeader title="Laporan Keuangan" subtitle="Financial Reports — Mustikatama Group"
+        actions={<Btn variant="secondary">📤 Export</Btn>} />
 
+      {/* Period picker — persistent across all tabs */}
+      <div className="mb-4 flex items-center justify-between flex-wrap gap-3 p-3 rounded-xl"
+        style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Periode:</span>
+          <PeriodPicker
+            preset={preset} onPreset={handlePreset}
+            startMonth={startMonth} endMonth={endMonth}
+            onStartMonth={setStartMonth} onEndMonth={setEndMonth}
+          />
+        </div>
+        <span className="text-xs text-gray-600">
+          {filteredData.length} bulan · {filteredData[0]?.month} – {filteredData[filteredData.length-1]?.month}
+        </span>
+      </div>
+
+      {/* Tab bar */}
       <div className="flex gap-2 mb-6 border-b border-gray-800 pb-0">
         {TABS.map(t=>(
           <button key={t.key} onClick={()=>setTab(t.key)}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
-              tab===t.key?"border-blue-500 text-white":"border-transparent text-gray-500 hover:text-gray-300"}`}>
+              tab===t.key?"border-yellow-400 text-white":"border-transparent text-gray-500 hover:text-gray-300"}`}>
             {t.icon} {t.label}
           </button>
         ))}
       </div>
 
-      {tab==="pnl"  && <PnLReport />}
+      {tab==="pnl"  && <PnLReport data={filteredData} />}
       {tab==="bs"   && <BalanceSheetReport />}
-      {tab==="kpis" && <KPIReport />}
+      {tab==="kpis" && <KPIReport data={filteredData} />}
     </div>
   );
 }

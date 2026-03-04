@@ -2,13 +2,29 @@ import { useState } from "react";
 import { PageHeader, Card, Btn, Badge, SearchBar, Table, Modal, toast, FormField } from "../../components/ui";
 import { IDR, NUM } from "../../lib/fmt";
 import { PRODUCTS } from "../../data/seed";
+import { useAuth } from "../../contexts/AuthContext";
+import { useMDM } from "../../contexts/MDMContext";
+import { canSubmitMDM, canApproveMDM, canDeactivate } from "../../lib/mdm";
+import { MDMStatusBadge, MDMApproveInline } from "../../components/MDMGate";
 
 const CATS = ["Plywood","Blockboard","MDF","Raw Material","Chemical","Packaging","Other"];
 const UNITS = ["sheets","m3","kg","pcs","roll","set"];
 const BLANK = { code:"", name:"", category:"Plywood", unit:"sheets", spec:"", price_idr:"", price_usd:"", stock_qty:"", reorder:"" };
 
 export default function Products() {
-  const [products, setProducts] = useState(PRODUCTS);
+  const { user } = useAuth();
+  const { submitMDM, addDirectly, approveMDM, deactivateMDM, getActive, getPending, pendingByType } = useMDM();
+  const isAdmin   = canApproveMDM(user?.role);
+  const canSubmit = canSubmitMDM(user?.role, "product");
+  const canDeact  = canDeactivate(user?.role, "product");
+  const pendingCount = pendingByType("product");
+
+  const allProducts = [
+    ...PRODUCTS,
+    ...getActive("product"),
+    ...getPending("product"),
+  ];
+
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("All");
   const [selected, setSelected] = useState(null);
@@ -19,10 +35,10 @@ export default function Products() {
 
   const set = (k) => (e) => { setForm(f=>({...f,[k]:e.target.value})); setErrors(er=>({...er,[k]:""})); };
 
-  const cats = ["All",...new Set(products.map(p=>p.category))];
-  const filtered = products
+  const cats = ["All",...new Set(allProducts.map(p=>p.category))];
+  const filtered = allProducts
     .filter(p => catFilter==="All" || p.category===catFilter)
-    .filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.code.toLowerCase().includes(search.toLowerCase()));
+    .filter(p => (p.name||"").toLowerCase().includes(search.toLowerCase()) || (p.code||"").toLowerCase().includes(search.toLowerCase()));
 
   const validate = () => {
     const e={};
@@ -44,33 +60,34 @@ export default function Products() {
     if(Object.keys(errs).length){setErrors(errs);return;}
     const data = { ...form, price_idr:Number(form.price_idr)||null, price_usd:Number(form.price_usd)||null, stock_qty:Number(form.stock_qty)||0, reorder:Number(form.reorder)||0 };
     if(editing){
-      setProducts(ps=>ps.map(p=>p.id===editing.id?{...p,...data}:p));
       toast(`${form.name} berhasil diperbarui ✅`);
     } else {
-      setProducts(ps=>[{id:`p${Date.now()}`,...data},...ps]);
-      toast(`Produk ${form.name} ditambahkan ✅`);
+      const rec = { id:`prod_${Date.now()}`, ...data, mdm_status: isAdmin?"active":"pending" };
+      if(isAdmin){ addDirectly("product", rec, user); toast(`✅ Produk ${form.name} ditambahkan`); }
+      else { submitMDM("product", rec, user); toast(`📤 Pengajuan dikirim — menunggu persetujuan admin`); }
     }
     setShowForm(false);
   };
 
-  const handleDelete = (p) => {
-    if(!window.confirm(`Hapus produk "${p.name}"?`)) return;
-    setProducts(ps=>ps.filter(x=>x.id!==p.id));
+  const handleDeactivate = (p) => {
+    if(!p._mdmId){ toast("Record bawaan tidak dapat dinonaktifkan dari UI","error"); return; }
+    deactivateMDM(p._mdmId);
     setSelected(null);
-    toast(`${p.name} dihapus`,"error");
+    toast(`${p.name} dinonaktifkan`,"error");
   };
 
   return (
     <div>
-      <PageHeader title="Daftar Produk" subtitle={`${products.length} produk`}
-        actions={<Btn onClick={openAdd}>+ Tambah Produk</Btn>} />
+      <PageHeader title="Daftar Produk"
+        subtitle={`${allProducts.filter(p=>!p._mdmStatus||p._mdmStatus==="active").length} produk aktif${pendingCount>0?` · ⏳ ${pendingCount} menunggu`:""}`}
+        actions={canSubmit && <Btn onClick={openAdd}>{isAdmin?"+ Tambah Produk":"📤 Ajukan Produk Baru"}</Btn>} />
 
       {/* Category filter */}
       <div className="flex gap-2 mb-4 flex-wrap">
         {cats.map(c=>(
           <button key={c} onClick={()=>setCatFilter(c)}
             className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${catFilter===c?"bg-blue-600 text-white":"bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
-            {c} <span className="opacity-60">{c==="All"?products.length:products.filter(p=>p.category===c).length}</span>
+            {c} <span className="opacity-60">{c==="All"?allProducts.length:allProducts.filter(p=>p.category===c).length}</span>
           </button>
         ))}
       </div>
@@ -79,7 +96,7 @@ export default function Products() {
         <div className="mb-4"><SearchBar value={search} onChange={setSearch} placeholder="Cari nama, kode produk…" /></div>
         <Table onRowClick={setSelected} columns={[
           { key:"code",      label:"Kode",       render:v=><span className="font-mono text-xs text-blue-400">{v||"—"}</span> },
-          { key:"name",      label:"Nama Produk" },
+          { key:"name",      label:"Nama Produk", render:(v,r)=><span className="flex items-center gap-2">{v}<MDMStatusBadge record={r}/></span> },
           { key:"category",  label:"Kategori",   render:v=><span className="text-xs text-gray-400">{v}</span> },
           { key:"unit",      label:"Satuan"      },
           { key:"price_idr", label:"Harga (IDR)",right:true, render:v=>v?<span className="font-mono text-xs">{IDR(v)}</span>:"—" },
@@ -116,14 +133,17 @@ export default function Products() {
             <div className="flex justify-end gap-2">
               <Btn variant="secondary" onClick={()=>setSelected(null)}>Tutup</Btn>
               <Btn variant="secondary" onClick={()=>openEdit(selected)}>✏️ Edit</Btn>
-              <Btn variant="danger" onClick={()=>handleDelete(selected)}>🗑 Hapus</Btn>
+              {isAdmin&&selected._mdmStatus==="pending"&&<Btn variant="success" onClick={()=>{approveMDM(selected._mdmId,user);toast(`✅ ${selected.name} disetujui`);setSelected(null);}}>✅ Setujui</Btn>}
+              {canDeact&&selected._mdmId&&<Btn variant="danger" onClick={()=>handleDeactivate(selected)}>⊘ Nonaktifkan</Btn>}
             </div>
           </div>
         </Modal>
       )}
 
       {showForm && (
-        <Modal title={editing?"Edit Produk":"Tambah Produk Baru"} onClose={()=>setShowForm(false)} width="max-w-xl">
+        <Modal title={editing?"Edit Produk":(isAdmin?"Tambah Produk Baru":"Ajukan Produk Baru")}
+          subtitle={!editing&&!isAdmin?"Akan ditinjau admin sebelum aktif":undefined}
+          onClose={()=>setShowForm(false)} width="max-w-xl">
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField label="Nama Produk" required>
@@ -163,7 +183,7 @@ export default function Products() {
             </div>
             <div className="flex justify-end gap-2 border-t border-gray-800 pt-4">
               <Btn variant="secondary" type="button" onClick={()=>setShowForm(false)}>Batal</Btn>
-              <Btn type="submit">{editing?"💾 Simpan":"✅ Tambah Produk"}</Btn>
+              <Btn type="submit">{editing?"💾 Simpan":(isAdmin?"✅ Tambah Produk":"📤 Kirim Pengajuan")}</Btn>
             </div>
           </form>
         </Modal>

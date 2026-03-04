@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { MDMProvider } from "./contexts/MDMContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
@@ -27,6 +28,10 @@ import Assets           from "./pages/operations/Assets";
 import ChartOfAccounts  from "./pages/settings/ChartOfAccounts";
 import CompanySettings  from "./pages/settings/CompanySettings";
 import AIAssistant      from "./pages/ai/AIAssistant";
+import MDMQueue         from "./pages/admin/MDMQueue";
+import Biaya            from "./pages/finance/Biaya";
+import Costing          from "./pages/production/Costing";
+import InventoryReport  from "./pages/inventory/InventoryReport";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -41,28 +46,41 @@ function AppRoutes() {
         <Layout>
           <Routes>
             <Route path="/"                    element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            {/* Sales */}
             <Route path="/sales/customers"     element={<ProtectedRoute><Customers /></ProtectedRoute>} />
             <Route path="/sales/orders"        element={<ProtectedRoute><SalesOrders /></ProtectedRoute>} />
             <Route path="/sales/proforma"      element={<ProtectedRoute><ProformaInvoices /></ProtectedRoute>} />
             <Route path="/sales/shipments"     element={<ProtectedRoute><Shipments /></ProtectedRoute>} />
+            {/* Purchasing */}
             <Route path="/purchasing/vendors"  element={<ProtectedRoute><Vendors /></ProtectedRoute>} />
             <Route path="/purchasing/orders"   element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
             <Route path="/purchasing/receipts" element={<ProtectedRoute><GoodsReceipts /></ProtectedRoute>} />
+            {/* Inventory */}
             <Route path="/inventory/products"  element={<ProtectedRoute><Products /></ProtectedRoute>} />
             <Route path="/inventory/stock"     element={<ProtectedRoute><StockLevels /></ProtectedRoute>} />
             <Route path="/inventory/movements" element={<ProtectedRoute><Movements /></ProtectedRoute>} />
+            {/* Finance */}
             <Route path="/finance/ar"          element={<ProtectedRoute><AR /></ProtectedRoute>} />
             <Route path="/finance/ap"          element={<ProtectedRoute><AP /></ProtectedRoute>} />
             <Route path="/finance/banks"       element={<ProtectedRoute><Banks /></ProtectedRoute>} />
             <Route path="/finance/ledger"      element={<ProtectedRoute><Ledger /></ProtectedRoute>} />
             <Route path="/finance/reports"     element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/finance/biaya"       element={<ProtectedRoute><Biaya /></ProtectedRoute>} />
+            {/* Inventory */}
+            <Route path="/inventory/report"    element={<ProtectedRoute><InventoryReport /></ProtectedRoute>} />
+            {/* Operations */}
             <Route path="/production"          element={<ProtectedRoute><Production /></ProtectedRoute>} />
+            <Route path="/production/costing"  element={<ProtectedRoute><Costing /></ProtectedRoute>} />
             <Route path="/hr/employees"        element={<ProtectedRoute><Employees /></ProtectedRoute>} />
             <Route path="/hr/payroll"          element={<ProtectedRoute><Payroll /></ProtectedRoute>} />
             <Route path="/assets"              element={<ProtectedRoute><Assets /></ProtectedRoute>} />
+            {/* Settings */}
             <Route path="/settings/coa"        element={<ProtectedRoute><ChartOfAccounts /></ProtectedRoute>} />
             <Route path="/settings/company"    element={<ProtectedRoute><CompanySettings /></ProtectedRoute>} />
+            {/* AI */}
             <Route path="/ai"                  element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
+            {/* Admin */}
+            <Route path="/admin/mdm"           element={<ProtectedRoute allowedRoles={["admin"]}><MDMQueue /></ProtectedRoute>} />
             <Route path="*"                    element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
@@ -74,7 +92,9 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <MDMProvider>
+        <AppRoutes />
+      </MDMProvider>
     </AuthProvider>
   );
 }

@@ -28,7 +28,7 @@ export const ROLES = {
     labelBI: "Pembelian / Pengadaan",
     color: "bg-purple-500/20 text-purple-300",
     description: "Vendor, purchase order, penerimaan barang, inventori",
-    allowedPaths: ["/", "/purchasing", "/inventory", "/inventory/products", "/inventory/stock", "/inventory/movements"],
+    allowedPaths: ["/", "/purchasing", "/inventory", "/production"],
   },
   warehouse: {
     label: "Warehouse",

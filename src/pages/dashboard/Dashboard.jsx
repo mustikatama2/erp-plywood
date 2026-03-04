@@ -3,6 +3,8 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { KPICard, Card, QuickActions, Tip, StatRow } from "../../components/ui";
 import { IDR, DATE, badge, PCT } from "../../lib/fmt";
 import { CUSTOMERS, AR_INVOICES, AP_INVOICES, SALES_ORDERS, BANK_ACCOUNTS, EMPLOYEES, PNL_MONTHLY, BALANCE_SHEET, PRODUCTS } from "../../data/seed";
+import AnomalyPanel from "../../components/ai/AnomalyPanel";
+import CashFlowForecast from "../../components/ai/CashFlowForecast";
 
 const TT = { contentStyle:{ background:"#111827", border:"1px solid #374151", borderRadius:8 }, labelStyle:{color:"#f3f4f6"} };
 
@@ -86,6 +88,23 @@ export default function Dashboard() {
         { icon:"💰", label:"Catat Pembayaran", sublabel:"Terima bayaran customer",  onClick:()=>navigate("/finance/ar") },
         { icon:"📈", label:"Laporan Keuangan", sublabel:"P&L, Neraca, Rasio",       onClick:()=>navigate("/finance/reports") },
       ]} />
+
+      {/* ── AI Anomaly Panel ── */}
+      <div className="erp-card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🤖</span>
+            <div>
+              <h3 className="text-sm font-bold text-white">Deteksi Anomali AI</h3>
+              <p className="text-xs text-gray-500">Smart alerts · diperbarui otomatis</p>
+            </div>
+          </div>
+          <button onClick={() => navigate("/ai")} className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+            Buka Asisten AI →
+          </button>
+        </div>
+        <AnomalyPanel compact={true} />
+      </div>
 
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
@@ -211,6 +230,24 @@ export default function Dashboard() {
           </div>
         </Card>
       </div>
+
+      {/* ── AI Cash Flow Forecast ── */}
+      <div className="erp-card p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">📈</span>
+            <div>
+              <h3 className="text-sm font-bold text-white">Proyeksi Arus Kas 90 Hari</h3>
+              <p className="text-xs text-gray-500">Berdasarkan AR/AP jatuh tempo · narasi AI</p>
+            </div>
+          </div>
+          <button onClick={() => navigate("/ai")} className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+            Analisis Penuh →
+          </button>
+        </div>
+        <CashFlowForecast />
+      </div>
+
     </div>
   );
 }

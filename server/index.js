@@ -23,6 +23,7 @@ app.use("/api/assets",       require("./routes/assets"));
 app.use("/api/accounts",     require("./routes/accounts"));
 app.use("/api/bank-accounts",require("./routes/banks"));
 app.use("/api/dashboard",    require("./routes/dashboard"));
+app.use("/api/ai",           require("./routes/ai"));
 
 // ── 404 / error handlers ─────────────────────────────────────────────────────
 app.use("*", (_, res) => res.status(404).json({ error: "Route not found" }));

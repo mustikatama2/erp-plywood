@@ -26,6 +26,7 @@ import Payroll          from "./pages/operations/Payroll";
 import Assets           from "./pages/operations/Assets";
 import ChartOfAccounts  from "./pages/settings/ChartOfAccounts";
 import CompanySettings  from "./pages/settings/CompanySettings";
+import AIAssistant      from "./pages/ai/AIAssistant";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -61,6 +62,7 @@ function AppRoutes() {
             <Route path="/assets"              element={<ProtectedRoute><Assets /></ProtectedRoute>} />
             <Route path="/settings/coa"        element={<ProtectedRoute><ChartOfAccounts /></ProtectedRoute>} />
             <Route path="/settings/company"    element={<ProtectedRoute><CompanySettings /></ProtectedRoute>} />
+            <Route path="/ai"                  element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
             <Route path="*"                    element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>

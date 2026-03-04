@@ -37,6 +37,9 @@ const NAV = [
     { to:"/hr/payroll",          icon:"💵", label:"Payroll",           bi:"Penggajian"        },
     { to:"/assets",              icon:"🏗️", label:"Fixed Assets",      bi:"Aset Tetap"        },
   ]},
+  { label:"AI & Analitik", items:[
+    { to:"/ai",                  icon:"🤖", label:"AI Assistant",      bi:"Asisten AI"        },
+  ]},
   { label:"Pengaturan", items:[
     { to:"/settings/coa",        icon:"📑", label:"Chart of Accounts", bi:"Daftar Akun"       },
     { to:"/settings/company",    icon:"⚙️", label:"Company",           bi:"Perusahaan"        },

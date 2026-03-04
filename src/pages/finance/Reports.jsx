@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { PageHeader, Card, Btn, KPICard } from "../../components/ui";
 import { IDR, PCT, NUM, exportCSV } from "../../lib/fmt";
-import { PNL_MONTHLY, BALANCE_SHEET } from "../../data/seed";
+import { PNL_MONTHLY, BALANCE_SHEET, ACCOUNTS } from "../../data/seed";
 import { useJournal } from "../../contexts/JournalContext";
 
 const TT = { contentStyle:{background:"#111827",border:"1px solid #374151",borderRadius:8}, labelStyle:{color:"#f3f4f6"} };
@@ -207,6 +207,273 @@ function KPIReport({ data = PNL_MONTHLY }) {
   );
 }
 
+// ── Trial Balance ─────────────────────────────────────────────────────────────
+function TrialBalance() {
+  const journal = useJournal();
+  const [asOf, setAsOf] = useState(new Date().toISOString().split("T")[0]);
+
+  const rows = useMemo(() => journal.getTrialBalance(), [journal]);
+
+  // Group by account type
+  const groups = useMemo(() => {
+    const map = { asset: [], liability: [], equity: [], revenue: [], expense: [], unknown: [] };
+    for (const r of rows) {
+      const g = map[r.type] || map.unknown;
+      g.push(r);
+    }
+    return map;
+  }, [rows]);
+
+  const totalDebit  = rows.reduce((s, r) => s + r.debit, 0);
+  const totalCredit = rows.reduce((s, r) => s + r.credit, 0);
+  const isBalanced  = Math.abs(totalDebit - totalCredit) < 1;
+
+  const GROUP_LABELS = {
+    asset: "Aset",
+    liability: "Liabilitas",
+    equity: "Ekuitas",
+    revenue: "Pendapatan",
+    expense: "Beban",
+    unknown: "Lainnya",
+  };
+
+  const exportData = rows.map(r => ({
+    account_code: r.acc,
+    account_name: r.name,
+    type: r.type,
+    debit: r.debit,
+    credit: r.credit,
+    net_balance: r.balance,
+  }));
+
+  return (
+    <div className="space-y-5">
+      {/* Controls */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">Per tanggal:</span>
+          <input type="date" value={asOf} onChange={e => setAsOf(e.target.value)}
+            className="erp-input text-sm py-1.5" />
+        </div>
+        <Btn variant="secondary" size="xs" onClick={() => exportCSV(exportData, "trial_balance.csv")}>
+          📤 Export CSV
+        </Btn>
+      </div>
+
+      {/* Balance status */}
+      <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm border ${
+        isBalanced
+          ? "bg-green-50 border-green-200 text-green-700"
+          : "bg-red-50 border-red-200 text-red-700"
+      }`}>
+        <span className="text-lg">{isBalanced ? "✅" : "⚠️"}</span>
+        <span className="font-semibold">
+          {isBalanced
+            ? "Trial Balance seimbang — Total Debit = Total Kredit"
+            : `Trial Balance TIDAK seimbang — Selisih: ${IDR(Math.abs(totalDebit - totalCredit))}`}
+        </span>
+      </div>
+
+      <Card>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b-2 border-gray-200">
+                <th className="text-left py-2.5 px-3 text-xs uppercase tracking-wider text-gray-500 font-bold w-20">Kode</th>
+                <th className="text-left py-2.5 px-3 text-xs uppercase tracking-wider text-gray-500 font-bold">Nama Akun</th>
+                <th className="text-left py-2.5 px-3 text-xs uppercase tracking-wider text-gray-500 font-bold w-24">Tipe</th>
+                <th className="text-right py-2.5 px-3 text-xs uppercase tracking-wider text-gray-500 font-bold w-36">Debit</th>
+                <th className="text-right py-2.5 px-3 text-xs uppercase tracking-wider text-gray-500 font-bold w-36">Kredit</th>
+                <th className="text-right py-2.5 px-3 text-xs uppercase tracking-wider text-gray-500 font-bold w-36">Saldo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(groups).map(([type, items]) => {
+                if (!items.length) return null;
+                return [
+                  <tr key={`hdr-${type}`} className="bg-gray-50">
+                    <td colSpan={6} className="py-2 px-3 text-xs font-black uppercase tracking-wider text-gray-600">
+                      {GROUP_LABELS[type] || type}
+                    </td>
+                  </tr>,
+                  ...items.map(r => (
+                    <tr key={r.acc} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-2 px-3 font-mono text-xs text-blue-700 font-bold">{r.acc}</td>
+                      <td className="py-2 px-3 text-gray-700">{r.name}</td>
+                      <td className="py-2 px-3">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          type === "asset"     ? "bg-blue-50 text-blue-700" :
+                          type === "liability" ? "bg-red-50 text-red-700" :
+                          type === "equity"    ? "bg-purple-50 text-purple-700" :
+                          type === "revenue"   ? "bg-green-50 text-green-700" :
+                          "bg-amber-50 text-amber-700"
+                        }`}>{type}</span>
+                      </td>
+                      <td className="py-2 px-3 text-right font-mono text-gray-700">
+                        {r.debit > 0 ? IDR(r.debit) : <span className="text-gray-300">—</span>}
+                      </td>
+                      <td className="py-2 px-3 text-right font-mono text-gray-700">
+                        {r.credit > 0 ? IDR(r.credit) : <span className="text-gray-300">—</span>}
+                      </td>
+                      <td className={`py-2 px-3 text-right font-mono font-bold ${
+                        r.balance > 0 ? "text-blue-700" : r.balance < 0 ? "text-red-700" : "text-gray-400"
+                      }`}>{IDR(r.balance)}</td>
+                    </tr>
+                  )),
+                ];
+              })}
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-gray-300 bg-gray-50 font-black">
+                <td className="py-3 px-3 text-xs uppercase tracking-wider text-gray-700" colSpan={3}>TOTAL</td>
+                <td className="py-3 px-3 text-right font-mono text-gray-900 text-sm">{IDR(totalDebit)}</td>
+                <td className="py-3 px-3 text-right font-mono text-gray-900 text-sm">{IDR(totalCredit)}</td>
+                <td className={`py-3 px-3 text-right font-mono text-sm ${isBalanced ? "text-green-700" : "text-red-700"}`}>
+                  {IDR(totalDebit - totalCredit)} {isBalanced ? "✅" : "⚠️"}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ── Cash Flow Statement ────────────────────────────────────────────────────────
+function CashFlowStatement() {
+  const journal = useJournal();
+  const bs = BALANCE_SHEET;
+
+  const pnl = useMemo(() => journal.getPnL(), [journal]);
+
+  // Operating cash flow (indirect method)
+  const netIncome      = pnl.netIncome || 0;
+  const depreciation   = 350000000; // est. from ASSETS
+  const changeAR       = -(bs.assets.ar - 650000000);   // decrease = positive
+  const changeInventory= -(bs.assets.inventory - 1800000000);
+  const changeAP       = bs.liabilities.ap - 480000000;  // increase = positive
+  const changeAccrued  = bs.liabilities.accrued - 120000000;
+  const operatingCF    = netIncome + depreciation + changeAR + changeInventory + changeAP + changeAccrued;
+
+  // Investing CF
+  const capex          = -1200000000; // purchase of machinery
+  const investingCF    = capex;
+
+  // Financing CF
+  const loanRepayment  = -450000000;
+  const dividends      = 0;
+  const financingCF    = loanRepayment + dividends;
+
+  const netChange      = operatingCF + investingCF + financingCF;
+  const beginCash      = 1200000000;
+  const endCash        = beginCash + netChange;
+
+  const Section = ({ title, rows, total, totalColor = "text-gray-900" }) => (
+    <div className="mb-6">
+      <p className="text-sm font-black text-gray-700 uppercase tracking-wider mb-3 pb-2 border-b border-gray-200">{title}</p>
+      <div className="space-y-1">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex justify-between py-1.5 text-sm border-b border-gray-100">
+            <span className="text-gray-500 ml-4">{label}</span>
+            <span className={`font-mono ${value >= 0 ? "text-green-700" : "text-red-700"}`}>
+              {value >= 0 ? "" : "("}{IDR(Math.abs(value))}{value < 0 ? ")" : ""}
+            </span>
+          </div>
+        ))}
+        <div className={`flex justify-between py-2 text-sm font-black border-t-2 border-gray-300 ${totalColor}`}>
+          <span>Total {title}</span>
+          <span className="font-mono">{total >= 0 ? "" : "("}{IDR(Math.abs(total))}{total < 0 ? ")" : ""}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-5">
+      <Card title="Laporan Arus Kas — 2026 YTD"
+        action={<Btn size="xs" variant="secondary" onClick={() => window.print()}>📤 PDF</Btn>}>
+        <div className="max-w-2xl">
+          {/* Operating */}
+          <Section
+            title="Aktivitas Operasi"
+            totalColor={operatingCF >= 0 ? "text-green-700" : "text-red-700"}
+            total={operatingCF}
+            rows={[
+              ["Laba Bersih", netIncome],
+              ["Penyusutan & Amortisasi", depreciation],
+              ["Perubahan Piutang Dagang (AR)", changeAR],
+              ["Perubahan Persediaan", changeInventory],
+              ["Perubahan Hutang Dagang (AP)", changeAP],
+              ["Perubahan Liabilitas Akrual", changeAccrued],
+            ]}
+          />
+          {/* Investing */}
+          <Section
+            title="Aktivitas Investasi"
+            totalColor={investingCF >= 0 ? "text-green-700" : "text-red-700"}
+            total={investingCF}
+            rows={[
+              ["Pembelian Aset Tetap (CAPEX)", capex],
+            ]}
+          />
+          {/* Financing */}
+          <Section
+            title="Aktivitas Pendanaan"
+            totalColor={financingCF >= 0 ? "text-green-700" : "text-red-700"}
+            total={financingCF}
+            rows={[
+              ["Cicilan Pinjaman Bank", loanRepayment],
+              ["Dividen Dibayar", dividends],
+            ]}
+          />
+
+          {/* Summary */}
+          <div className="border-t-2 border-gray-300 pt-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Saldo Kas Awal Periode</span>
+              <span className="font-mono font-bold text-gray-700">{IDR(beginCash)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Kenaikan / (Penurunan) Bersih</span>
+              <span className={`font-mono font-bold ${netChange >= 0 ? "text-green-700" : "text-red-700"}`}>
+                {netChange >= 0 ? "" : "("}{IDR(Math.abs(netChange))}{netChange < 0 ? ")" : ""}
+              </span>
+            </div>
+            <div className="flex justify-between text-lg font-black border-t border-gray-200 pt-2">
+              <span className="text-gray-900">Saldo Kas Akhir Periode</span>
+              <span className="font-mono text-blue-700">{IDR(endCash)}</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Visual bar */}
+      <Card title="Ringkasan Arus Kas">
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={[
+            { name: "Operasi",  value: operatingCF / 1e6 },
+            { name: "Investasi",value: investingCF / 1e6 },
+            { name: "Pendanaan",value: financingCF / 1e6 },
+            { name: "Net",      value: netChange / 1e6 },
+          ]}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 12 }} />
+            <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} />
+            <Tooltip formatter={(v) => [`Rp ${v.toFixed(0)}jt`, "Arus Kas"]}
+              contentStyle={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8 }} />
+            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+              {[operatingCF, investingCF, financingCF, netChange].map((v, i) => (
+                <Cell key={i} fill={v >= 0 ? "#22c55e" : "#ef4444"} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+    </div>
+  );
+}
+
 // ── Period Picker ─────────────────────────────────────────────────────────────
 
 const PRESETS = [
@@ -287,8 +554,10 @@ export default function Reports() {
 
   const TABS = [
     { key:"pnl",     label:"P&L Statement",  icon:"📈" },
-    { key:"bs",      label:"Balance Sheet",   icon:"⚖️" },
+    { key:"bs",      label:"Balance Sheet",   icon:"🏦" },
     { key:"kpis",    label:"KPIs",            icon:"🎯" },
+    { key:"tb",      label:"Trial Balance",   icon:"⚖️" },
+    { key:"cf",      label:"Cash Flow",       icon:"💧" },
   ];
 
   return (
@@ -326,6 +595,8 @@ export default function Reports() {
       {tab==="pnl"  && <PnLReport data={filteredData} journalSummary={journalSummary} />}
       {tab==="bs"   && <BalanceSheetReport />}
       {tab==="kpis" && <KPIReport data={filteredData} />}
+      {tab==="tb"   && <TrialBalance />}
+      {tab==="cf"   && <CashFlowStatement />}
     </div>
   );
 }

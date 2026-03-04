@@ -5,6 +5,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { useMDM } from "../contexts/MDMContext";
 import { canApproveMDM } from "../lib/mdm";
 import { COMPANY } from "../data/seed";
+import { GlobalSearchProvider, useGlobalSearch } from "./GlobalSearch";
+import NotificationCenter from "./NotificationCenter";
 
 const NAV = [
   { label:"Ringkasan",  items:[
@@ -34,6 +36,7 @@ const NAV = [
     { to:"/finance/ledger",      icon:"📒", label:"Ledger",            bi:"Buku Besar"        },
     { to:"/finance/reports",     icon:"📈", label:"Reports",           bi:"Laporan Keuangan"  },
     { to:"/finance/biaya",       icon:"📆", label:"Prepaid Expenses",  bi:"Biaya Dibayar Muka"},
+    { to:"/finance/lc",          icon:"🏦", label:"LC Tracker",         bi:"Letter of Credit"  },
   ]},
   { label:"Operasional",items:[
     { to:"/production",          icon:"🏭", label:"Production",        bi:"Produksi"          },
@@ -66,9 +69,10 @@ function LiveClock() {
   );
 }
 
-export default function Layout({ children }) {
+function LayoutInner({ children }) {
   const { user, role, logout, can } = useAuth();
   const { pendingCount } = useMDM();
+  const { setOpen: openSearch } = useGlobalSearch();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -225,7 +229,19 @@ export default function Layout({ children }) {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
+            {/* ⌘K search pill */}
+            <button
+              onClick={() => openSearch(true)}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-gray-400 hover:text-gray-200 transition-colors"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+            >
+              <span>🔍</span>
+              <span>Cari…</span>
+              <kbd className="text-gray-500 font-mono text-xs border border-gray-600 rounded px-1">⌘K</kbd>
+            </button>
             <LiveClock />
+            {/* Notification Center */}
+            <NotificationCenter />
             {/* User menu */}
             <div className="relative">
               <button onClick={() => setShowUserMenu(!showUserMenu)}
@@ -262,5 +278,13 @@ export default function Layout({ children }) {
 
       <ToastProvider />
     </div>
+  );
+}
+
+export default function Layout({ children }) {
+  return (
+    <GlobalSearchProvider>
+      <LayoutInner>{children}</LayoutInner>
+    </GlobalSearchProvider>
   );
 }

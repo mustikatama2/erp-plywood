@@ -1,10 +1,112 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal, toast, FormField } from "../../components/ui";
 import { IDR, DATE, badge, exportCSV } from "../../lib/fmt";
 import { AP_INVOICES, VENDORS } from "../../data/seed";
 import { DocumentParserButton } from "../../components/ai/DocumentParser";
 import { useJournal } from "../../contexts/JournalContext";
 import DocumentTrail from "../../components/DocumentTrail";
+
+// ── AP Aging Analysis ─────────────────────────────────────────────────────────
+function APAgingBuckets({ bills, vendors }) {
+  const today = new Date();
+
+  const aging = useMemo(() => {
+    const map = {};
+    bills.filter(b => b.status !== "Paid" && b.balance > 0).forEach(b => {
+      const vid = b.vendor_id;
+      if (!map[vid]) map[vid] = { vendor: vendors.find(v => v.id === vid), b0: 0, b30: 0, b60: 0, b90: 0 };
+      const days = Math.round((today - new Date(b.due_date)) / 86400000);
+      if      (days <= 30)  map[vid].b0  += b.balance;
+      else if (days <= 60)  map[vid].b30 += b.balance;
+      else if (days <= 90)  map[vid].b60 += b.balance;
+      else                  map[vid].b90 += b.balance;
+    });
+    return Object.values(map).map(r => ({
+      ...r,
+      total: r.b0 + r.b30 + r.b60 + r.b90,
+      name: r.vendor?.name?.split(" ").slice(0, 3).join(" ") || "—",
+    }));
+  }, [bills, vendors]);
+
+  const totals = aging.reduce((s, r) => ({
+    b0: s.b0 + r.b0, b30: s.b30 + r.b30,
+    b60: s.b60 + r.b60, b90: s.b90 + r.b90,
+    total: s.total + r.total,
+  }), { b0: 0, b30: 0, b60: 0, b90: 0, total: 0 });
+
+  const chartData = aging.map(r => ({
+    name: r.name,
+    "0-30 hr": Math.round(r.b0 / 1e6),
+    "31-60 hr": Math.round(r.b30 / 1e6),
+    "61-90 hr": Math.round(r.b60 / 1e6),
+    "90+ hr": Math.round(r.b90 / 1e6),
+  }));
+
+  return (
+    <div className="space-y-5 mt-5">
+      <Card title="AP Aging per Vendor (Rp Juta)">
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 11 }} />
+            <YAxis tick={{ fill: "#6b7280", fontSize: 10 }} />
+            <Tooltip contentStyle={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8 }} />
+            <Bar dataKey="0-30 hr"  stackId="a" fill="#22c55e" />
+            <Bar dataKey="31-60 hr" stackId="a" fill="#f59e0b" />
+            <Bar dataKey="61-90 hr" stackId="a" fill="#f97316" />
+            <Bar dataKey="90+ hr"   stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+        <div className="flex gap-4 mt-2 text-xs justify-center flex-wrap">
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-green-500" /> 0–30 hr</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-amber-500" /> 31–60 hr</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-orange-500" /> 61–90 hr</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-red-500" /> 90+ hr</span>
+        </div>
+      </Card>
+
+      <Card title="Detail Aging per Vendor">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b-2 border-gray-200">
+                <th className="text-left py-2.5 px-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Vendor</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-green-700 uppercase tracking-wider">0–30 hr</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-amber-700 uppercase tracking-wider">31–60 hr</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-orange-700 uppercase tracking-wider">61–90 hr</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-red-700 uppercase tracking-wider">90+ hr</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-gray-700 uppercase tracking-wider">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {aging.map(r => (
+                <tr key={r.vendor?.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-2.5 px-3 font-medium text-gray-800">{r.name}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-green-700">{r.b0 > 0 ? IDR(r.b0) : <span className="text-gray-300">—</span>}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-amber-700">{r.b30 > 0 ? IDR(r.b30) : <span className="text-gray-300">—</span>}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-orange-700">{r.b60 > 0 ? IDR(r.b60) : <span className="text-gray-300">—</span>}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-red-700">{r.b90 > 0 ? IDR(r.b90) : <span className="text-gray-300">—</span>}</td>
+                  <td className="py-2.5 px-3 text-right font-mono font-black text-gray-900">{IDR(r.total)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-gray-300 bg-gray-50 font-black">
+                <td className="py-2.5 px-3 text-gray-700 text-sm uppercase tracking-wider">Total</td>
+                <td className="py-2.5 px-3 text-right font-mono text-green-700 text-sm">{IDR(totals.b0)}</td>
+                <td className="py-2.5 px-3 text-right font-mono text-amber-700 text-sm">{IDR(totals.b30)}</td>
+                <td className="py-2.5 px-3 text-right font-mono text-orange-700 text-sm">{IDR(totals.b60)}</td>
+                <td className="py-2.5 px-3 text-right font-mono text-red-700 text-sm">{IDR(totals.b90)}</td>
+                <td className="py-2.5 px-3 text-right font-mono text-gray-900 text-sm">{IDR(totals.total)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
 
 const EMPTY_FORM = {
   vendor_id:"", inv_no:"", date:"", due_date:"", description:"", total:"", currency:"IDR", notes:""
@@ -130,11 +232,12 @@ function NewBillModal({ onClose, onSave }) {
 export default function AP() {
   const journal = useJournal();
 
-  const [search,  setSearch]  = useState("");
-  const [filter,  setFilter]  = useState("All");
-  const [selected,setSelected]= useState(null);
-  const [newBill, setNewBill] = useState(false);
-  const [bills,   setBills]   = useState(AP_INVOICES);
+  const [search,    setSearch]    = useState("");
+  const [filter,    setFilter]    = useState("All");
+  const [selected,  setSelected]  = useState(null);
+  const [newBill,   setNewBill]   = useState(false);
+  const [bills,     setBills]     = useState(AP_INVOICES);
+  const [showAging, setShowAging] = useState(false);
 
   const enriched = bills.map(i => ({
     ...i, vendor: VENDORS.find(v=>v.id===i.vendor_id),
@@ -153,6 +256,9 @@ export default function AP() {
     <div>
       <PageHeader title="Hutang Dagang (AP)" subtitle="Tagihan vendor & jadwal pembayaran"
         actions={<>
+          <Btn variant="secondary" onClick={() => setShowAging(a => !a)}>
+            {showAging ? "📋 Hide Aging" : "📊 Aging Analysis"}
+          </Btn>
           <Btn variant="secondary" onClick={() => exportCSV(enriched.map(b=>({inv_no:b.inv_no,vendor:b.vendor?.name,description:b.description,total:b.total,paid:b.paid,balance:b.balance,status:b.status,due_date:b.due_date})),"ap_hutang.csv")}>📤 Export</Btn>
           <Btn onClick={() => setNewBill(true)}>+ Tagihan Baru</Btn>
         </>}
@@ -198,6 +304,10 @@ export default function AP() {
           { key:"status",     label:"Status",       render:v=><Badge status={v} /> },
         ]} data={filtered} />
       </Card>
+
+      {showAging && (
+        <APAgingBuckets bills={enriched} vendors={VENDORS} />
+      )}
 
       {/* Detail / payment modal */}
       {selected && (

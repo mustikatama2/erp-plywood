@@ -33,6 +33,7 @@ import MDMQueue         from "./pages/admin/MDMQueue";
 import Biaya            from "./pages/finance/Biaya";
 import Costing          from "./pages/production/Costing";
 import InventoryReport  from "./pages/inventory/InventoryReport";
+import LC               from "./pages/finance/LC";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -67,6 +68,7 @@ function AppRoutes() {
             <Route path="/finance/ledger"      element={<ProtectedRoute><Ledger /></ProtectedRoute>} />
             <Route path="/finance/reports"     element={<ProtectedRoute><Reports /></ProtectedRoute>} />
             <Route path="/finance/biaya"       element={<ProtectedRoute><Biaya /></ProtectedRoute>} />
+            <Route path="/finance/lc"          element={<ProtectedRoute><LC /></ProtectedRoute>} />
             {/* Inventory */}
             <Route path="/inventory/report"    element={<ProtectedRoute><InventoryReport /></ProtectedRoute>} />
             {/* Operations */}

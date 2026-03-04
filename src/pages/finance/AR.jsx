@@ -1,9 +1,113 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from "recharts";
 import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal, FormField, Divider, toast } from "../../components/ui";
 import { IDR, DATE, exportCSV } from "../../lib/fmt";
 import { AR_INVOICES, CUSTOMERS, SALES_ORDERS, SHIPMENTS } from "../../data/seed";
 import { useJournal } from "../../contexts/JournalContext";
 import DocumentTrail from "../../components/DocumentTrail";
+
+// ── AR Aging Analysis ─────────────────────────────────────────────────────────
+function AgingBuckets({ invoices, customers }) {
+  const today = new Date();
+
+  const aging = useMemo(() => {
+    const map = {};
+    invoices.filter(i => i.status !== "Paid" && i.balance_idr > 0).forEach(i => {
+      const cid = i.customer_id;
+      if (!map[cid]) map[cid] = { customer: customers.find(c => c.id === cid), b0: 0, b30: 0, b60: 0, b90: 0 };
+      const days = Math.round((today - new Date(i.due_date)) / 86400000);
+      if      (days <= 30)  map[cid].b0  += i.balance_idr;
+      else if (days <= 60)  map[cid].b30 += i.balance_idr;
+      else if (days <= 90)  map[cid].b60 += i.balance_idr;
+      else                  map[cid].b90 += i.balance_idr;
+    });
+    return Object.values(map).map(r => ({
+      ...r,
+      total: r.b0 + r.b30 + r.b60 + r.b90,
+      name: r.customer?.name?.split(" ").slice(0, 3).join(" ") || "—",
+    }));
+  }, [invoices, customers]);
+
+  const totals = aging.reduce((s, r) => ({
+    b0: s.b0 + r.b0, b30: s.b30 + r.b30,
+    b60: s.b60 + r.b60, b90: s.b90 + r.b90,
+    total: s.total + r.total,
+  }), { b0: 0, b30: 0, b60: 0, b90: 0, total: 0 });
+
+  const chartData = aging.map(r => ({
+    name: r.name,
+    "0-30 hr": Math.round(r.b0 / 1e6),
+    "31-60 hr": Math.round(r.b30 / 1e6),
+    "61-90 hr": Math.round(r.b60 / 1e6),
+    "90+ hr": Math.round(r.b90 / 1e6),
+  }));
+
+  return (
+    <div className="space-y-5 mt-5">
+      {/* Bar chart */}
+      <Card title="AR Aging per Customer (Rp Juta)">
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 11 }} />
+            <YAxis tick={{ fill: "#6b7280", fontSize: 10 }} />
+            <Tooltip contentStyle={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8 }} />
+            <Bar dataKey="0-30 hr"  stackId="a" fill="#22c55e" radius={[0,0,0,0]} />
+            <Bar dataKey="31-60 hr" stackId="a" fill="#f59e0b" />
+            <Bar dataKey="61-90 hr" stackId="a" fill="#f97316" />
+            <Bar dataKey="90+ hr"   stackId="a" fill="#ef4444" radius={[4,4,0,0]} />
+          </BarChart>
+        </ResponsiveContainer>
+        <div className="flex gap-4 mt-2 text-xs justify-center flex-wrap">
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-green-500" /> 0–30 hr</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-amber-500" /> 31–60 hr</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-orange-500" /> 61–90 hr</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-red-500" /> 90+ hr</span>
+        </div>
+      </Card>
+
+      {/* Table */}
+      <Card title="Detail Aging per Customer">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b-2 border-gray-200">
+                <th className="text-left py-2.5 px-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Customer</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-green-700 uppercase tracking-wider">0–30 hr</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-amber-700 uppercase tracking-wider">31–60 hr</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-orange-700 uppercase tracking-wider">61–90 hr</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-red-700 uppercase tracking-wider">90+ hr</th>
+                <th className="text-right py-2.5 px-3 text-xs font-bold text-gray-700 uppercase tracking-wider">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {aging.map(r => (
+                <tr key={r.customer?.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-2.5 px-3 font-medium text-gray-800">{r.name}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-green-700">{r.b0 > 0 ? IDR(r.b0) : <span className="text-gray-300">—</span>}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-amber-700">{r.b30 > 0 ? IDR(r.b30) : <span className="text-gray-300">—</span>}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-orange-700">{r.b60 > 0 ? IDR(r.b60) : <span className="text-gray-300">—</span>}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-red-700">{r.b90 > 0 ? IDR(r.b90) : <span className="text-gray-300">—</span>}</td>
+                  <td className="py-2.5 px-3 text-right font-mono font-black text-gray-900">{IDR(r.total)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-gray-300 bg-gray-50 font-black">
+                <td className="py-2.5 px-3 text-gray-700 text-sm uppercase tracking-wider">Total</td>
+                <td className="py-2.5 px-3 text-right font-mono text-green-700 text-sm">{IDR(totals.b0)}</td>
+                <td className="py-2.5 px-3 text-right font-mono text-amber-700 text-sm">{IDR(totals.b30)}</td>
+                <td className="py-2.5 px-3 text-right font-mono text-orange-700 text-sm">{IDR(totals.b60)}</td>
+                <td className="py-2.5 px-3 text-right font-mono text-red-700 text-sm">{IDR(totals.b90)}</td>
+                <td className="py-2.5 px-3 text-right font-mono text-gray-900 text-sm">{IDR(totals.total)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
 
 const today = new Date().toISOString().split("T")[0];
 const FX = 15560;
@@ -234,6 +338,7 @@ export default function AR() {
   const [showPayment, setShowPayment] = useState(false);
   const [localInvoices, setLocalInvoices] = useState([]);
   const [overrides, setOverrides]     = useState({}); // id → partial overrides
+  const [showAging, setShowAging]     = useState(false);
 
   const allInvoices = [...localInvoices, ...AR_INVOICES];
 
@@ -272,6 +377,9 @@ export default function AR() {
       <PageHeader title="Piutang Dagang (AR)" subtitle="Invoice customer & status pembayaran"
         actions={
           <>
+            <Btn variant="secondary" onClick={() => setShowAging(a => !a)}>
+              {showAging ? "📋 Hide Aging" : "📊 Aging Analysis"}
+            </Btn>
             <Btn variant="secondary" onClick={() => exportCSV(enriched.map(i => ({ ...i, customer: i.customer?.name })), "ar.csv")}>📤 Export</Btn>
             <Btn onClick={() => setShowNew(true)}>+ New Invoice</Btn>
           </>
@@ -312,6 +420,10 @@ export default function AR() {
           { key: "status",   label: "Status",        render: v => <Badge status={v} /> },
         ]} data={filtered} />
       </Card>
+
+      {showAging && (
+        <AgingBuckets invoices={enriched} customers={CUSTOMERS} />
+      )}
 
       {selected && selectedEnriched && (
         <Modal title={`Invoice ${selectedEnriched.inv_no}`} onClose={() => setSelected(null)}>

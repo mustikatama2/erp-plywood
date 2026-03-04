@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { MDMProvider } from "./contexts/MDMContext";
+import { JournalProvider } from "./contexts/JournalContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
@@ -92,9 +93,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <MDMProvider>
-        <AppRoutes />
-      </MDMProvider>
+      <JournalProvider>
+        <MDMProvider>
+          <AppRoutes />
+        </MDMProvider>
+      </JournalProvider>
     </AuthProvider>
   );
 }

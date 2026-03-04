@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PageHeader, Card, Btn, Badge, SearchBar, Table, Modal, FormField, toast } from "../../components/ui";
 import { DATE } from "../../lib/fmt";
 import { SHIPMENTS, CUSTOMERS, SALES_ORDERS, COMPANY } from "../../data/seed";
+import DocumentTrail from "../../components/DocumentTrail";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -264,6 +265,13 @@ export default function Shipments() {
                 ✅ SVLK Certificate valid — Timber Legality Compliance confirmed for this shipment
               </div>
             )}
+
+            <DocumentTrail
+              refId={selected.id}
+              refType="SHIPMENT"
+              blNo={selected.bl_no}
+              soId={selected.so_id}
+            />
 
             <div className="flex justify-end gap-2">
               <Btn variant="secondary" onClick={() => setSelected(null)}>Close</Btn>

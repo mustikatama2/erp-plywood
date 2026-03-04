@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal, FormField, Divider, toast } from "../../components/ui";
 import { IDR, DATE, exportCSV } from "../../lib/fmt";
-import { AR_INVOICES, CUSTOMERS, SALES_ORDERS } from "../../data/seed";
+import { AR_INVOICES, CUSTOMERS, SALES_ORDERS, SHIPMENTS } from "../../data/seed";
+import { useJournal } from "../../contexts/JournalContext";
+import DocumentTrail from "../../components/DocumentTrail";
 
 const today = new Date().toISOString().split("T")[0];
 const FX = 15560;
@@ -170,7 +172,7 @@ function RecordPaymentModal({ invoice, onClose, onSave }) {
     const paid = Number(form.amount);
     const newBalance = Math.max(0, invoice.balance - paid);
     const newStatus = newBalance === 0 ? "Paid" : "Partial";
-    onSave(invoice.id, { paid: invoice.paid + paid, balance: newBalance, status: newStatus });
+    onSave(invoice.id, { paid: invoice.paid + paid, balance: newBalance, status: newStatus }, paid, form.method);
     toast(`✅ Pembayaran ${invoice.currency} ${paid.toLocaleString()} dicatat untuk ${invoice.inv_no}`, "success");
     onClose();
   };
@@ -223,6 +225,8 @@ function RecordPaymentModal({ invoice, onClose, onSave }) {
 }
 
 export default function AR() {
+  const journal = useJournal();
+
   const [search, setSearch]           = useState("");
   const [filter, setFilter]           = useState("All");
   const [selected, setSelected]       = useState(null);
@@ -249,9 +253,14 @@ export default function AR() {
   const total   = enriched.reduce((s, i) => s + i.balance_idr, 0);
   const overdue = enriched.filter(i => i.status === "Overdue").reduce((s, i) => s + i.balance_idr, 0);
 
-  const handlePaymentSave = (id, changes) => {
+  const handlePaymentSave = (id, changes, paymentAmount, paymentMethod) => {
     setOverrides(prev => ({ ...prev, [id]: { ...(prev[id] || {}), ...changes } }));
-    // Update selected if open
+    // Post journal entry for payment
+    const inv = enriched.find(i => i.id === id);
+    if (inv && paymentAmount > 0) {
+      const amtIDR = paymentAmount * (inv.currency === "USD" ? FX : 1);
+      journal.postARPayment(inv, amtIDR, paymentMethod);
+    }
     setSelected(null);
   };
 
@@ -321,6 +330,18 @@ export default function AR() {
                 {selectedEnriched.currency} {selectedEnriched.balance.toLocaleString()}
               </span>
             </div>
+            {/* Document Trail */}
+            {(() => {
+              const shipment = SHIPMENTS.find(s => s.so_id === selectedEnriched.so_id);
+              return (
+                <DocumentTrail
+                  refId={selectedEnriched.id}
+                  refType="AR"
+                  blNo={shipment?.bl_no || null}
+                  soId={selectedEnriched.so_id}
+                />
+              );
+            })()}
             <div className="flex justify-end gap-2">
               <Btn variant="secondary" onClick={() => setSelected(null)}>Close</Btn>
               {selectedEnriched.balance > 0 && (
@@ -343,7 +364,12 @@ export default function AR() {
       {showNew && (
         <NewInvoiceModal
           onClose={() => setShowNew(false)}
-          onSave={inv => setLocalInvoices(prev => [inv, ...prev])}
+          onSave={inv => {
+            setLocalInvoices(prev => [inv, ...prev]);
+            const customer = CUSTOMERS.find(c => c.id === inv.customer_id);
+            const shipment = SHIPMENTS.find(s => s.so_id === inv.so_id);
+            journal.postAR(inv, customer, shipment?.bl_no || null, inv.so_id || null);
+          }}
           invoices={allInvoices}
         />
       )}

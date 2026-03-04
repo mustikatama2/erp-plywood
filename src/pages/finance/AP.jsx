@@ -3,6 +3,8 @@ import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal, toast, 
 import { IDR, DATE, badge } from "../../lib/fmt";
 import { AP_INVOICES, VENDORS } from "../../data/seed";
 import { DocumentParserButton } from "../../components/ai/DocumentParser";
+import { useJournal } from "../../contexts/JournalContext";
+import DocumentTrail from "../../components/DocumentTrail";
 
 const EMPTY_FORM = {
   vendor_id:"", inv_no:"", date:"", due_date:"", description:"", total:"", currency:"IDR", notes:""
@@ -126,6 +128,8 @@ function NewBillModal({ onClose, onSave }) {
 }
 
 export default function AP() {
+  const journal = useJournal();
+
   const [search,  setSearch]  = useState("");
   const [filter,  setFilter]  = useState("All");
   const [selected,setSelected]= useState(null);
@@ -210,10 +214,20 @@ export default function AP() {
               <span className="text-sm text-gray-400">Sisa Tagihan</span>
               <span className={`text-2xl font-black ${selected.balance>0?"text-amber-700":"text-green-700"}`}>{IDR(selected.balance)}</span>
             </div>
+            <DocumentTrail
+              refId={selected.id}
+              refType="AP"
+              blNo={null}
+              soId={null}
+            />
             <div className="flex justify-end gap-2">
               <Btn variant="secondary" onClick={()=>setSelected(null)}>Tutup</Btn>
               {selected.balance > 0 && (
-                <Btn variant="success" onClick={()=>{toast("✅ Pembayaran berhasil dicatat");setSelected(null);}}>
+                <Btn variant="success" onClick={()=>{
+                  journal.postAPPayment(selected, selected.balance);
+                  toast("✅ Pembayaran berhasil dicatat");
+                  setSelected(null);
+                }}>
                   💳 Catat Pembayaran
                 </Btn>
               )}

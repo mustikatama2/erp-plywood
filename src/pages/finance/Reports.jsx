@@ -1,17 +1,27 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { PageHeader, Card, Btn, KPICard } from "../../components/ui";
 import { IDR, PCT, NUM } from "../../lib/fmt";
 import { PNL_MONTHLY, BALANCE_SHEET } from "../../data/seed";
+import { useJournal } from "../../contexts/JournalContext";
 
 const TT = { contentStyle:{background:"#111827",border:"1px solid #374151",borderRadius:8}, labelStyle:{color:"#f3f4f6"} };
 
-function PnLReport({ data = PNL_MONTHLY }) {
+function PnLReport({ data = PNL_MONTHLY, journalSummary = null }) {
   const cur = data[data.length-1] || PNL_MONTHLY[PNL_MONTHLY.length-1];
   const ytd = data.reduce((a,m)=>({
     revenue:a.revenue+m.revenue, cogs:a.cogs+m.cogs, gross:a.gross+m.gross,
     opex:a.opex+m.opex, ebitda:a.ebitda+m.ebitda, net:a.net+m.net
   }), {revenue:0,cogs:0,gross:0,opex:0,ebitda:0,net:0});
+
+  // If journal has data, overlay it on the YTD summary
+  const liveRevenue   = journalSummary?.revenue    || 0;
+  const liveCOGS      = journalSummary?.cogs        || 0;
+  const liveExpenses  = journalSummary?.totalExpenses || 0;
+  const liveGross     = journalSummary?.grossProfit || 0;
+  const liveNet       = journalSummary?.netIncome   || 0;
+  const liveCount     = journalSummary?.entryCount  || 0;
+  const hasLiveData   = liveRevenue > 0;
 
   const Row = ({label,value,pct,bold,indent,color="text-gray-700"}) => (
     <div className={`flex justify-between py-2 border-b border-gray-200/50 text-sm ${bold?"font-black text-gray-900":""}`}>
@@ -25,6 +35,20 @@ function PnLReport({ data = PNL_MONTHLY }) {
 
   return (
     <div className="space-y-6">
+      {/* Live / static banner */}
+      <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm border ${
+        hasLiveData
+          ? "bg-green-500/8 border-green-500/20 text-green-700"
+          : "bg-amber-500/8 border-amber-500/20 text-amber-700"
+      }`}>
+        <span>{hasLiveData ? "📊" : "📋"}</span>
+        <span className="font-medium">
+          {hasLiveData
+            ? `Berdasarkan ${liveCount} jurnal entries (live data dari General Ledger)`
+            : "Data contoh (belum ada transaksi — tambah invoice untuk melihat data live)"}
+        </span>
+      </div>
+
       {/* Monthly trend */}
       <Card title="Revenue & Profit Trend (Rp Juta)">
         <ResponsiveContainer width="100%" height={200}>
@@ -43,21 +67,36 @@ function PnLReport({ data = PNL_MONTHLY }) {
       </Card>
 
       {/* P&L Statement */}
-      <Card title="Profit & Loss Statement — Year to Date 2026"
+      <Card title={hasLiveData ? "Profit & Loss Statement — Live (dari Jurnal)" : "Profit & Loss Statement — Year to Date 2026"}
         action={<Btn size="xs" variant="secondary">📤 Export PDF</Btn>}>
         <div className="px-0">
           <div className="flex justify-between text-xs text-gray-500 mb-2 px-0 border-b border-gray-200 pb-2 font-bold uppercase tracking-wider">
             <span>Description</span>
-            <div className="flex gap-8 text-right"><span className="w-32">YTD 2026</span><span className="w-16">Margin</span></div>
+            <div className="flex gap-8 text-right">
+              <span className="w-32">{hasLiveData ? "Live (Jurnal)" : "YTD 2026"}</span>
+              <span className="w-16">Margin</span>
+            </div>
           </div>
-          <Row label="Net Revenue"          value={ytd.revenue} pct={100}                    bold />
-          <Row label="Cost of Goods Sold"   value={ytd.cogs}    pct={ytd.cogs/ytd.revenue*100} indent color="text-red-700" />
-          <Row label="Gross Profit"         value={ytd.gross}   pct={ytd.gross/ytd.revenue*100} bold color="text-green-700" />
-          <Row label="Operating Expenses"   value={ytd.opex}    indent color="text-red-700" />
-          <Row label="EBITDA"               value={ytd.ebitda}  pct={ytd.ebitda/ytd.revenue*100} bold color="text-blue-700" />
-          <Row label="Interest Expense"     value={PNL_MONTHLY.reduce((s,m)=>s+m.interest,0)} indent color="text-red-700" />
-          <Row label="Income Tax"           value={PNL_MONTHLY.reduce((s,m)=>s+m.tax,0)}      indent color="text-red-700" />
-          <Row label="Net Income"           value={ytd.net}     pct={ytd.net/ytd.revenue*100} bold color="text-purple-700" />
+          {hasLiveData ? (
+            <>
+              <Row label="Net Revenue"        value={liveRevenue} pct={100} bold />
+              <Row label="Cost of Goods Sold" value={liveCOGS} pct={liveRevenue ? liveCOGS/liveRevenue*100 : 0} indent color="text-red-700" />
+              <Row label="Gross Profit"       value={liveGross} pct={liveRevenue ? liveGross/liveRevenue*100 : 0} bold color="text-green-700" />
+              <Row label="Operating Expenses" value={liveExpenses} indent color="text-red-700" />
+              <Row label="Net Income"         value={liveNet} pct={liveRevenue ? liveNet/liveRevenue*100 : 0} bold color="text-purple-700" />
+            </>
+          ) : (
+            <>
+              <Row label="Net Revenue"          value={ytd.revenue} pct={100}                    bold />
+              <Row label="Cost of Goods Sold"   value={ytd.cogs}    pct={ytd.cogs/ytd.revenue*100} indent color="text-red-700" />
+              <Row label="Gross Profit"         value={ytd.gross}   pct={ytd.gross/ytd.revenue*100} bold color="text-green-700" />
+              <Row label="Operating Expenses"   value={ytd.opex}    indent color="text-red-700" />
+              <Row label="EBITDA"               value={ytd.ebitda}  pct={ytd.ebitda/ytd.revenue*100} bold color="text-blue-700" />
+              <Row label="Interest Expense"     value={PNL_MONTHLY.reduce((s,m)=>s+m.interest,0)} indent color="text-red-700" />
+              <Row label="Income Tax"           value={PNL_MONTHLY.reduce((s,m)=>s+m.tax,0)}      indent color="text-red-700" />
+              <Row label="Net Income"           value={ytd.net}     pct={ytd.net/ytd.revenue*100} bold color="text-purple-700" />
+            </>
+          )}
         </div>
       </Card>
 
@@ -226,6 +265,8 @@ function filterByPeriod(data, preset, startMonth, endMonth) {
 }
 
 export default function Reports() {
+  const journal = useJournal();
+
   const [tab, setTab] = useState("pnl");
   const [preset, setPreset] = useState("6m");
   const [startMonth, setStartMonth] = useState(PNL_MONTHLY[0]?.month || "");
@@ -240,6 +281,9 @@ export default function Reports() {
   };
 
   const filteredData = filterByPeriod(PNL_MONTHLY, preset, startMonth, endMonth);
+
+  // Live journal P&L
+  const journalSummary = useMemo(() => journal.getPnL(), [journal]);
 
   const TABS = [
     { key:"pnl",     label:"P&L Statement",  icon:"📈" },
@@ -279,7 +323,7 @@ export default function Reports() {
         ))}
       </div>
 
-      {tab==="pnl"  && <PnLReport data={filteredData} />}
+      {tab==="pnl"  && <PnLReport data={filteredData} journalSummary={journalSummary} />}
       {tab==="bs"   && <BalanceSheetReport />}
       {tab==="kpis" && <KPIReport data={filteredData} />}
     </div>

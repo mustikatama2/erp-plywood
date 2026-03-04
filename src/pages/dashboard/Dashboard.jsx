@@ -5,11 +5,13 @@ import { IDR, DATE, badge, PCT } from "../../lib/fmt";
 import { CUSTOMERS, AR_INVOICES, AP_INVOICES, SALES_ORDERS, BANK_ACCOUNTS, EMPLOYEES, PNL_MONTHLY, BALANCE_SHEET, PRODUCTS } from "../../data/seed";
 import AnomalyPanel from "../../components/ai/AnomalyPanel";
 import CashFlowForecast from "../../components/ai/CashFlowForecast";
+import { useJournal } from "../../contexts/JournalContext";
 
-const TT = { contentStyle:{ background:"#111827", border:"1px solid #374151", borderRadius:8 }, labelStyle:{color:"#f3f4f6"} };
+const TT = { contentStyle:{ background:"#FFFFFF", border:"1px solid #DDD8CC", borderRadius:8 }, labelStyle:{color:"#1E2414"} };
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const journal  = useJournal();
   const FX = 15560;
 
   const totalAR    = AR_INVOICES.reduce((s,i) => s + i.balance * (i.currency==="USD"?FX:1), 0);
@@ -18,7 +20,13 @@ export default function Dashboard() {
   const overdueAP  = AP_INVOICES.filter(i => i.status === "Overdue");
   const openSO     = SALES_ORDERS.filter(s => !["Shipped","Cancelled"].includes(s.status));
   const totalCash  = BANK_ACCOUNTS.reduce((s,b) => s + (b.currency==="USD"?b.balance*FX:b.balance), 0);
-  const cur        = PNL_MONTHLY[PNL_MONTHLY.length-1];
+
+  // Use live journal P&L when available, fall back to seed
+  const livePnL    = journal.getPnL();
+  const hasLive    = livePnL.revenue > 0;
+  const cur        = hasLive
+    ? { revenue: livePnL.revenue, gross: livePnL.grossProfit, net: livePnL.netIncome }
+    : PNL_MONTHLY[PNL_MONTHLY.length-1];
   const prev       = PNL_MONTHLY[PNL_MONTHLY.length-2];
   const revTrend   = ((cur.revenue - prev.revenue) / prev.revenue) * 100;
   const lowStock   = PRODUCTS.filter(p => p.stock_qty < p.reorder);

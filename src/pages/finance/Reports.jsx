@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { PageHeader, Card, Btn, KPICard } from "../../components/ui";
-import { IDR, PCT, NUM } from "../../lib/fmt";
+import { IDR, PCT, NUM, exportCSV } from "../../lib/fmt";
 import { PNL_MONTHLY, BALANCE_SHEET } from "../../data/seed";
 import { useJournal } from "../../contexts/JournalContext";
 
@@ -68,7 +68,7 @@ function PnLReport({ data = PNL_MONTHLY, journalSummary = null }) {
 
       {/* P&L Statement */}
       <Card title={hasLiveData ? "Profit & Loss Statement — Live (dari Jurnal)" : "Profit & Loss Statement — Year to Date 2026"}
-        action={<Btn size="xs" variant="secondary">📤 Export PDF</Btn>}>
+        action={<Btn size="xs" variant="secondary" onClick={() => window.print()}>📤 Export PDF</Btn>}>
         <div className="px-0">
           <div className="flex justify-between text-xs text-gray-500 mb-2 px-0 border-b border-gray-200 pb-2 font-bold uppercase tracking-wider">
             <span>Description</span>
@@ -147,7 +147,7 @@ function BalanceSheetReport() {
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-      <Card title="Assets" action={<Btn size="xs" variant="secondary">📤 PDF</Btn>}>
+      <Card title="Assets" action={<Btn size="xs" variant="secondary" onClick={() => window.print()}>📤 PDF</Btn>}>
         <Section title="Current Assets" color="text-blue-700" total={bs.assets.cash+bs.assets.ar+bs.assets.inventory+bs.assets.prepaid}
           items={[["Cash & Bank",bs.assets.cash],["Accounts Receivable",bs.assets.ar],["Inventory",bs.assets.inventory],["Prepaid Expenses",bs.assets.prepaid]]} />
         <Section title="Fixed Assets" color="text-teal-400" total={bs.assets.fixed_net}
@@ -294,7 +294,7 @@ export default function Reports() {
   return (
     <div>
       <PageHeader title="Laporan Keuangan" subtitle="Financial Reports — Mustikatama Group"
-        actions={<Btn variant="secondary">📤 Export</Btn>} />
+        actions={<Btn variant="secondary" onClick={() => exportCSV(filteredData, "laporan_keuangan.csv")}>📤 Export CSV</Btn>} />
 
       {/* Period picker — persistent across all tabs */}
       <div className="mb-4 flex items-center justify-between flex-wrap gap-3 p-3 rounded-xl"

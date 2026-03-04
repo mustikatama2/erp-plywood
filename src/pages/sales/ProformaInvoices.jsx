@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageHeader, Card, Btn, Badge, SearchBar, Table, Modal, FormField, Divider, toast } from "../../components/ui";
-import { IDR, DATE } from "../../lib/fmt";
+import { IDR, DATE, exportCSV } from "../../lib/fmt";
 import { PROFORMAS, CUSTOMERS, COMPANY } from "../../data/seed";
 
 const today = new Date().toISOString().split("T")[0];
@@ -189,7 +189,7 @@ export default function ProformaInvoices() {
       <PageHeader title="Proforma Invoices" subtitle={`${allPIs.length} total`}
         actions={
           <>
-            <Btn variant="secondary">📤 Export</Btn>
+            <Btn variant="secondary" onClick={() => exportCSV(allPIs.map(p=>({pi_no:p.pi_no,customer:p.customer?.name,date:p.date,valid_until:p.valid_until,currency:p.currency,total:p.total,payment_terms:p.payment_terms,status:p.status})),"proforma_invoices.csv")}>📤 Export</Btn>
             <Btn onClick={() => setShowNew(true)}>+ New PI</Btn>
           </>
         }

@@ -45,7 +45,9 @@ export default function CompanySettings() {
               <label htmlFor="auto-je" className="text-sm text-gray-700">Auto-create journal entries on invoice posting</label>
             </div>
             <div className="flex justify-end">
-              <Btn>Save Preferences</Btn>
+              <Btn onClick={()=>{setSaved(true);setTimeout(()=>setSaved(false),2000)}}>
+                {saved?"✅ Tersimpan!":"Simpan Preferensi"}
+              </Btn>
             </div>
           </div>
         </Card>

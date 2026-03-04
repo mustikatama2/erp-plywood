@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageHeader, Card, Btn, Badge, KPICard, SearchBar, Table, Modal, toast, FormField } from "../../components/ui";
-import { IDR, DATE, badge } from "../../lib/fmt";
+import { IDR, DATE, badge, exportCSV } from "../../lib/fmt";
 import { AP_INVOICES, VENDORS } from "../../data/seed";
 import { DocumentParserButton } from "../../components/ai/DocumentParser";
 import { useJournal } from "../../contexts/JournalContext";
@@ -153,7 +153,7 @@ export default function AP() {
     <div>
       <PageHeader title="Hutang Dagang (AP)" subtitle="Tagihan vendor & jadwal pembayaran"
         actions={<>
-          <Btn variant="secondary">📤 Export</Btn>
+          <Btn variant="secondary" onClick={() => exportCSV(enriched.map(b=>({inv_no:b.inv_no,vendor:b.vendor?.name,description:b.description,total:b.total,paid:b.paid,balance:b.balance,status:b.status,due_date:b.due_date})),"ap_hutang.csv")}>📤 Export</Btn>
           <Btn onClick={() => setNewBill(true)}>+ Tagihan Baru</Btn>
         </>}
       />
@@ -225,7 +225,11 @@ export default function AP() {
               {selected.balance > 0 && (
                 <Btn variant="success" onClick={()=>{
                   journal.postAPPayment(selected, selected.balance);
-                  toast("✅ Pembayaran berhasil dicatat");
+                  setBills(prev => prev.map(b => b.id === selected.id
+                    ? { ...b, paid: b.total, balance: 0, status: "Paid" }
+                    : b
+                  ));
+                  toast("✅ Pembayaran AP berhasil dicatat & jurnal diposting");
                   setSelected(null);
                 }}>
                   💳 Catat Pembayaran

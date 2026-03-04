@@ -15,7 +15,7 @@
 
 import { useState } from "react";
 import { PageHeader, Card, Btn, KPICard, Modal, toast, FormField } from "../../components/ui";
-import { IDR, PCT, NUM } from "../../lib/fmt";
+import { IDR, PCT, NUM, exportCSV } from "../../lib/fmt";
 import { PRODUCTS } from "../../data/seed";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from "recharts";
 
@@ -540,7 +540,7 @@ export default function Costing() {
               </tbody>
             </table>
             <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-200">
-              <Btn variant="secondary">📤 Export Variance Report</Btn>
+              <Btn variant="secondary" onClick={() => exportCSV(allResults.map(r=>({batch:r.batch.batch_no,product:r.batch.product_name,dm_mpv:r.dm.mpv,dm_mqv:r.dm.mqv,dl_lrv:r.dl.lrv,dl_lev:r.dl.lev,foh_sv:r.foh.spending,foh_ev:r.foh.efficiency,total_variance:r.totalVariance,status:r.batch.status})),"variance_report.csv")}>📤 Export Variance Report</Btn>
               <Btn onClick={() => toast("✅ Jurnal varians bulan ini berhasil dicatat")}>
                 📒 Catat Semua Jurnal Varians
               </Btn>

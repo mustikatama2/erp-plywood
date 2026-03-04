@@ -168,8 +168,8 @@ function EmployeeDetailModal({ emp, onClose, onEdit }) {
         </div>
         <div className="flex justify-end gap-2 border-t border-gray-100 pt-3">
           <Btn variant="secondary" onClick={onClose}>Tutup</Btn>
-          <Btn variant="secondary">📅 Absensi</Btn>
-          <Btn variant="secondary">💵 Slip Gaji</Btn>
+          <Btn variant="secondary" onClick={() => toast("Modul absensi dalam pengembangan — integrasi fingerprint", "info")}>📅 Absensi</Btn>
+          <Btn variant="secondary" onClick={() => { onClose(); toast("Buka halaman Payroll untuk cetak slip gaji"); }}>💵 Slip Gaji</Btn>
           {onEdit && <Btn onClick={() => onEdit(emp)}>✏️ Edit</Btn>}
         </div>
       </div>

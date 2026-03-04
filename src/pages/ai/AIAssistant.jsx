@@ -27,7 +27,7 @@ function MessageBubble({ msg }) {
       <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
         isUser
           ? "bg-blue-600 text-white rounded-br-sm"
-          : "bg-gray-800 text-gray-100 rounded-bl-sm"
+          : "bg-gray-100 text-gray-700 rounded-bl-sm"
       }`}>
         {msg.streaming && !msg.content ? (
           <span className="flex items-center gap-1.5 text-gray-400">
@@ -62,7 +62,7 @@ function FormattedContent({ content }) {
         if (line.startsWith("•") || line.startsWith("-")) {
           return (
             <div key={i} className="flex gap-2">
-              <span className="text-blue-400 flex-shrink-0">•</span>
+              <span className="text-blue-700 flex-shrink-0">•</span>
               <span dangerouslySetInnerHTML={{ __html: boldify(line.slice(1).trim()) }} />
             </div>
           );
@@ -84,7 +84,7 @@ function FormattedContent({ content }) {
 }
 
 function boldify(text) {
-  return text.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-bold">$1</strong>');
+  return text.replace(/\*\*(.+?)\*\*/g, '<strong class="text-gray-900 font-bold">$1</strong>');
 }
 
 export default function AIAssistant() {
@@ -152,13 +152,13 @@ export default function AIAssistant() {
       <PageHeader title="Asisten AI" subtitle="Analisis data bisnis dengan kecerdasan buatan" />
 
       {/* Tab bar */}
-      <div className="flex gap-1 mb-5 border-b border-gray-800 pb-0 flex-wrap">
+      <div className="flex gap-1 mb-5 border-b border-gray-200 pb-0 flex-wrap">
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
               activeTab === t.key
-                ? "border-blue-500 text-white"
-                : "border-transparent text-gray-500 hover:text-gray-300"
+                ? "border-blue-500 text-gray-900"
+                : "border-transparent text-gray-500 hover:text-gray-700"
             }`}>
             {t.icon} {t.label}
           </button>
@@ -184,7 +184,7 @@ export default function AIAssistant() {
             <div className="flex gap-2 flex-wrap mb-3">
               {SUGGESTIONS.slice(0, 4).map(s => (
                 <button key={s} onClick={() => sendMessage(s)}
-                  className="text-xs bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 px-3 py-1.5 rounded-full transition-colors">
+                  className="text-xs bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 px-3 py-1.5 rounded-full transition-colors">
                   {s}
                 </button>
               ))}
@@ -192,7 +192,7 @@ export default function AIAssistant() {
           )}
 
           {/* Input bar */}
-          <div className="flex gap-2 pt-3 border-t border-gray-800">
+          <div className="flex gap-2 pt-3 border-t border-gray-200">
             <textarea
               ref={inputRef}
               value={input}

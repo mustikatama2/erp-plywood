@@ -39,11 +39,11 @@ export default function Ledger() {
               const tot = e.lines.reduce((s,l)=>s+l.debit,0);
               return (
                 <tr key={e.no} className="cursor-pointer" onClick={()=>setOpen(open===e.no?null:e.no)}>
-                  <td><span className="font-mono font-bold text-blue-400">{e.no}</span></td>
+                  <td><span className="font-mono font-bold text-blue-700">{e.no}</span></td>
                   <td className="text-gray-400 text-xs">{e.date}</td>
                   <td>{e.desc}</td>
                   <td className="text-right font-mono">{IDR(tot)}</td>
-                  <td><span className="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded">Posted</span></td>
+                  <td><span className="text-xs font-bold text-green-700 bg-green-500/10 px-2 py-0.5 rounded">Posted</span></td>
                 </tr>
               );
             })}
@@ -62,18 +62,18 @@ export default function Ledger() {
                 <tbody>
                   {e.lines.map((l,i)=>(
                     <tr key={i}>
-                      <td><span className="font-mono text-blue-400">{l.acc}</span></td>
+                      <td><span className="font-mono text-blue-700">{l.acc}</span></td>
                       <td>{l.name}</td>
-                      <td className="text-right font-mono text-green-400">{l.debit>0?IDR(l.debit):"—"}</td>
-                      <td className="text-right font-mono text-red-400">{l.credit>0?IDR(l.credit):"—"}</td>
+                      <td className="text-right font-mono text-green-700">{l.debit>0?IDR(l.debit):"—"}</td>
+                      <td className="text-right font-mono text-red-700">{l.credit>0?IDR(l.credit):"—"}</td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
-                  <tr className="font-black text-gray-300">
+                  <tr className="font-black text-gray-700">
                     <td colSpan={2} className="px-4 py-2">Total</td>
-                    <td className="text-right px-4 py-2 text-green-400">{IDR(e.lines.reduce((s,l)=>s+l.debit,0))}</td>
-                    <td className="text-right px-4 py-2 text-red-400">{IDR(e.lines.reduce((s,l)=>s+l.credit,0))}</td>
+                    <td className="text-right px-4 py-2 text-green-700">{IDR(e.lines.reduce((s,l)=>s+l.debit,0))}</td>
+                    <td className="text-right px-4 py-2 text-red-700">{IDR(e.lines.reduce((s,l)=>s+l.credit,0))}</td>
                   </tr>
                 </tfoot>
               </table>

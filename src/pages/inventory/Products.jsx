@@ -86,7 +86,7 @@ export default function Products() {
       <div className="flex gap-2 mb-4 flex-wrap">
         {cats.map(c=>(
           <button key={c} onClick={()=>setCatFilter(c)}
-            className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${catFilter===c?"bg-blue-600 text-white":"bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+            className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${catFilter===c?"bg-blue-600 text-white":"bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
             {c} <span className="opacity-60">{c==="All"?allProducts.length:allProducts.filter(p=>p.category===c).length}</span>
           </button>
         ))}
@@ -95,13 +95,13 @@ export default function Products() {
       <Card>
         <div className="mb-4"><SearchBar value={search} onChange={setSearch} placeholder="Cari nama, kode produk…" /></div>
         <Table onRowClick={setSelected} columns={[
-          { key:"code",      label:"Kode",       render:v=><span className="font-mono text-xs text-blue-400">{v||"—"}</span> },
+          { key:"code",      label:"Kode",       render:v=><span className="font-mono text-xs text-blue-700">{v||"—"}</span> },
           { key:"name",      label:"Nama Produk", render:(v,r)=><span className="flex items-center gap-2">{v}<MDMStatusBadge record={r}/></span> },
           { key:"category",  label:"Kategori",   render:v=><span className="text-xs text-gray-400">{v}</span> },
           { key:"unit",      label:"Satuan"      },
           { key:"price_idr", label:"Harga (IDR)",right:true, render:v=>v?<span className="font-mono text-xs">{IDR(v)}</span>:"—" },
           { key:"stock_qty", label:"Stok",       right:true, render:(v,r)=>(
-            <span className={v<r.reorder?"text-red-400 font-black":"font-mono"}>
+            <span className={v<r.reorder?"text-red-700 font-black":"font-mono"}>
               {NUM(v)} {v<r.reorder&&r.reorder>0?" ⚠️":""}
             </span>
           )},
@@ -116,17 +116,17 @@ export default function Products() {
               {[["Spesifikasi",selected.spec||"—"],["Satuan",selected.unit],
                 ["Harga IDR",selected.price_idr?IDR(selected.price_idr):"—"],
                 ["Harga USD",selected.price_usd?`$ ${selected.price_usd}`:"—"]].map(([k,v])=>(
-                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-white">{v}</p></div>
+                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-gray-900">{v}</p></div>
               ))}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className={`erp-card p-3 text-center ${selected.stock_qty<selected.reorder&&selected.reorder>0?"border border-red-500/40":""}`}>
-                <p className={`text-2xl font-black ${selected.stock_qty<selected.reorder&&selected.reorder>0?"text-red-400":"text-white"}`}>{NUM(selected.stock_qty)}</p>
+                <p className={`text-2xl font-black ${selected.stock_qty<selected.reorder&&selected.reorder>0?"text-red-700":"text-gray-900"}`}>{NUM(selected.stock_qty)}</p>
                 <p className="text-xs text-gray-500 mt-1">Stok ({selected.unit})</p>
-                {selected.stock_qty<selected.reorder&&selected.reorder>0 && <p className="text-xs text-red-400 mt-1">⚠️ Di bawah reorder point</p>}
+                {selected.stock_qty<selected.reorder&&selected.reorder>0 && <p className="text-xs text-red-700 mt-1">⚠️ Di bawah reorder point</p>}
               </div>
               <div className="erp-card p-3 text-center">
-                <p className="text-2xl font-black text-amber-300">{NUM(selected.reorder||0)}</p>
+                <p className="text-2xl font-black text-amber-700">{NUM(selected.reorder||0)}</p>
                 <p className="text-xs text-gray-500 mt-1">Reorder Point</p>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function Products() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField label="Nama Produk" required>
                 <input value={form.name} onChange={set("name")} className={`erp-input ${errors.name?"border-red-500":""}`} placeholder="Contoh: Plywood 18mm Marine" />
-                {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
+                {errors.name && <p className="text-xs text-red-700 mt-1">{errors.name}</p>}
               </FormField>
               <FormField label="Kode Produk">
                 <input value={form.code} onChange={set("code")} className="erp-input" placeholder="Contoh: PLY-1800M" />
@@ -181,7 +181,7 @@ export default function Products() {
                 <input type="number" value={form.reorder} onChange={set("reorder")} className="erp-input" placeholder="0" />
               </FormField>
             </div>
-            <div className="flex justify-end gap-2 border-t border-gray-800 pt-4">
+            <div className="flex justify-end gap-2 border-t border-gray-200 pt-4">
               <Btn variant="secondary" type="button" onClick={()=>setShowForm(false)}>Batal</Btn>
               <Btn type="submit">{editing?"💾 Simpan":(isAdmin?"✅ Tambah Produk":"📤 Kirim Pengajuan")}</Btn>
             </div>

@@ -185,20 +185,20 @@ function NewEntryModal({ onClose, onSave, entries }) {
     <Modal title="+ Entri Biaya Dibayar di Muka" subtitle="Amortisasi biaya yang dibayar di awal" onClose={onClose} width="max-w-2xl">
       <div className="p-5 space-y-4">
         <div>
-          <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Deskripsi</label>
+          <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Deskripsi</label>
           <input value={form.description} onChange={set("description")} className="erp-input"
             placeholder="Misal: Asuransi Pabrik 2026" />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Kategori</label>
+            <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Kategori</label>
             <select value={form.category} onChange={set("category")} className="erp-input">
               {CATEGORIES.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}
             </select>
           </div>
           <div>
-            <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Jumlah Total (IDR)</label>
+            <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Jumlah Total (IDR)</label>
             <input type="number" value={form.total_amount} onChange={set("total_amount")} className="erp-input"
               placeholder="120000000" />
             {amount > 0 && <p className="text-xs text-gray-500 mt-0.5">{IDR(amount)}</p>}
@@ -206,28 +206,28 @@ function NewEntryModal({ onClose, onSave, entries }) {
         </div>
 
         <div>
-          <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Tanggal Pembayaran</label>
+          <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Tanggal Pembayaran</label>
           <input type="date" value={form.payment_date} onChange={set("payment_date")} className="erp-input" />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Periode Mulai</label>
+            <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Periode Mulai</label>
             <input type="date" value={form.start_date} onChange={set("start_date")} className="erp-input" />
           </div>
           <div>
-            <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Periode Akhir</label>
+            <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Periode Akhir</label>
             <input type="date" value={form.end_date} onChange={set("end_date")} className="erp-input" />
           </div>
         </div>
 
         {durationMonths > 0 && amount > 0 && (
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 space-y-2">
-            <p className="text-xs font-bold text-blue-400 uppercase tracking-wide">📊 Kalkulasi Amortisasi</p>
+            <p className="text-xs font-bold text-blue-700 uppercase tracking-wide">📊 Kalkulasi Amortisasi</p>
             <div className="grid grid-cols-3 gap-3 text-sm">
               <div>
                 <p className="text-xs text-gray-500">Durasi</p>
-                <p className="font-bold text-white">{durationMonths} bulan</p>
+                <p className="font-bold text-gray-900">{durationMonths} bulan</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Beban / Bulan</p>
@@ -235,7 +235,7 @@ function NewEntryModal({ onClose, onSave, entries }) {
               </div>
               <div>
                 <p className="text-xs text-gray-500">Per Tahun (est.)</p>
-                <p className="font-bold text-gray-300">{IDR(monthly * 12)}</p>
+                <p className="font-bold text-gray-700">{IDR(monthly * 12)}</p>
               </div>
             </div>
             {previewSched.length > 0 && (
@@ -273,7 +273,7 @@ function NewEntryModal({ onClose, onSave, entries }) {
             placeholder="Misal: Nomor polis, nama lembaga, dll." />
         </div>
 
-        <div className="flex justify-end gap-2 pt-2 border-t border-gray-800">
+        <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
           <Btn variant="secondary" onClick={onClose}>Batal</Btn>
           <Btn onClick={handleSave} disabled={saving}>
             {saving ? "Menyimpan…" : "💾 Simpan Entri"}
@@ -316,7 +316,7 @@ function BiayaDetailModal({ entry, onClose }) {
           ].map(([k, v]) => (
             <div key={k}>
               <p className="text-xs text-gray-500">{k}</p>
-              <p className="font-semibold text-white mt-0.5 text-sm">{v}</p>
+              <p className="font-semibold text-gray-900 mt-0.5 text-sm">{v}</p>
             </div>
           ))}
         </div>
@@ -327,7 +327,7 @@ function BiayaDetailModal({ entry, onClose }) {
             <span>Progres Amortisasi: {PCT(calc.pctAmortized)}</span>
             <span>{calc.monthsElapsed} bln / {calc.durationMonths} bln</span>
           </div>
-          <div className="w-full bg-gray-800 rounded-full h-3">
+          <div className="w-full bg-gray-100 rounded-full h-3">
             <div
               className="h-3 rounded-full bg-gradient-to-r from-blue-600 to-teal-400 transition-all"
               style={{ width: `${Math.min(calc.pctAmortized, 100)}%` }}
@@ -363,11 +363,11 @@ function BiayaDetailModal({ entry, onClose }) {
                       <td className="text-gray-500">{i + 1}</td>
                       <td>
                         {row.month_label}
-                        {isCurrent && <span className="ml-1 text-xs text-blue-400">← Bulan ini</span>}
+                        {isCurrent && <span className="ml-1 text-xs text-blue-700">← Bulan ini</span>}
                       </td>
                       <td className="text-right font-mono text-blue-300">{IDR(row.charge)}</td>
                       <td className="text-right font-mono font-bold">
-                        <span className={row.balance <= 0 ? "text-green-400" : "text-white"}>
+                        <span className={row.balance <= 0 ? "text-green-700" : "text-gray-900"}>
                           {IDR(row.balance)}
                         </span>
                       </td>
@@ -380,7 +380,7 @@ function BiayaDetailModal({ entry, onClose }) {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-2 pt-2 border-t border-gray-800">
+        <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
           <Btn variant="secondary" onClick={onClose}>Tutup</Btn>
           {calc.status === "Active" && (
             <Btn variant="success" onClick={() => {
@@ -431,11 +431,11 @@ export default function Biaya() {
 
   // Status badge color mapping
   const statusBadgeClass = (status) => {
-    if (status === "Active")  return "text-green-400 bg-green-500/10";
-    if (status === "Paid")    return "text-gray-400 bg-gray-800";
-    if (status === "Overdue") return "text-red-400 bg-red-500/10";
-    if (status === "Pending") return "text-amber-400 bg-amber-500/10";
-    return "text-gray-400 bg-gray-800";
+    if (status === "Active")  return "text-green-700 bg-green-500/10";
+    if (status === "Paid")    return "text-gray-400 bg-gray-100";
+    if (status === "Overdue") return "text-red-700 bg-red-500/10";
+    if (status === "Pending") return "text-amber-700 bg-amber-500/10";
+    return "text-gray-400 bg-gray-100";
   };
 
   return (
@@ -452,7 +452,7 @@ export default function Biaya() {
           label="Total Saldo Prepaid"
           value={IDR(totalBalance)}
           icon="💼"
-          color="text-amber-400"
+          color="text-amber-700"
           sub="Belum terbebankan"
         />
         <KPICard
@@ -466,14 +466,14 @@ export default function Biaya() {
           label="Berakhir Bulan Ini"
           value={expiringCount}
           icon="⚠️"
-          color={expiringCount > 0 ? "text-red-400" : "text-green-400"}
+          color={expiringCount > 0 ? "text-red-700" : "text-green-700"}
           sub="Perlu diperbarui"
         />
         <KPICard
           label="Selesai Diamortisasi"
           value={fullyAmortized}
           icon="✅"
-          color="text-blue-400"
+          color="text-blue-700"
           sub="Dari total entri"
         />
       </div>
@@ -488,7 +488,7 @@ export default function Biaya() {
                 className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${
                   catFilter === c
                     ? "bg-blue-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                 }`}>
                 {c === "All" ? "Semua" : c}{" "}
                 <span className="ml-1 opacity-70">
@@ -508,14 +508,14 @@ export default function Biaya() {
             {
               key: "code",
               label: "Kode",
-              render: v => <span className="font-mono text-xs text-blue-400 font-bold">{v}</span>,
+              render: v => <span className="font-mono text-xs text-blue-700 font-bold">{v}</span>,
             },
             {
               key: "description",
               label: "Deskripsi",
               render: (v, row) => (
                 <div>
-                  <p className="font-medium text-white">{v}</p>
+                  <p className="font-medium text-gray-900">{v}</p>
                   <p className="text-xs text-gray-500">{row.notes}</p>
                 </div>
               ),
@@ -524,7 +524,7 @@ export default function Biaya() {
               key: "category",
               label: "Kategori",
               render: v => (
-                <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-300">
+                <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700">
                   {CAT_ICONS[v] || "📦"} {v}
                 </span>
               ),
@@ -548,14 +548,14 @@ export default function Biaya() {
               key: "_calc",
               label: "Beban/Bln",
               right: true,
-              render: c => <span className="font-mono text-blue-400">{IDR(c.monthly)}</span>,
+              render: c => <span className="font-mono text-blue-700">{IDR(c.monthly)}</span>,
             },
             {
               key: "_calc",
               label: "Saldo Sisa",
               right: true,
               render: c => (
-                <span className={`font-mono font-bold ${c.remaining > 0 ? "text-teal-400" : "text-green-400"}`}>
+                <span className={`font-mono font-bold ${c.remaining > 0 ? "text-teal-400" : "text-green-700"}`}>
                   {IDR(c.remaining)}
                 </span>
               ),

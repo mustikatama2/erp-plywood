@@ -25,12 +25,12 @@ export default function ProformaInvoices() {
       <Card>
         <div className="mb-4"><SearchBar value={search} onChange={setSearch} placeholder="Search PI no, customer…" /></div>
         <Table onRowClick={setSelected} columns={[
-          { key:"pi_no",   label:"PI Number",  render:v=><span className="font-mono font-bold text-blue-400">{v}</span> },
+          { key:"pi_no",   label:"PI Number",  render:v=><span className="font-mono font-bold text-blue-700">{v}</span> },
           { key:"customer",label:"Customer",   render:v=>v?.name },
           { key:"date",    label:"Date",       render:DATE },
           { key:"valid_until",label:"Valid Until",render:(v,r)=>{
             const expired = new Date(v) < new Date();
-            return <span className={expired?"text-red-400":"text-gray-300"}>{DATE(v)}{expired?" ⚠️":""}</span>;
+            return <span className={expired?"text-red-700":"text-gray-700"}>{DATE(v)}{expired?" ⚠️":""}</span>;
           }},
           { key:"payment_terms",label:"Payment Terms" },
           { key:"currency",label:"Currency" },
@@ -49,10 +49,10 @@ export default function ProformaInvoices() {
                 <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium">{v||"—"}</p></div>
               ))}
             </div>
-            {selected.notes && <div className="bg-gray-800/40 rounded p-3 text-sm text-gray-400">{selected.notes}</div>}
+            {selected.notes && <div className="bg-gray-50 rounded p-3 text-sm text-gray-400">{selected.notes}</div>}
             <div className="erp-card p-4 flex justify-between items-center">
               <span className="text-gray-400">Total Amount</span>
-              <span className="text-2xl font-black text-green-400">{selected.currency} {selected.total.toLocaleString()}</span>
+              <span className="text-2xl font-black text-green-700">{selected.currency} {selected.total.toLocaleString()}</span>
             </div>
             <div className="flex gap-2 justify-end">
               <Btn variant="secondary" onClick={()=>setSelected(null)}>Close</Btn>

@@ -23,13 +23,13 @@ export default function Banks() {
           <div key={b.id} className="erp-card p-5">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <p className="font-bold text-white text-sm">{b.name}</p>
+                <p className="font-bold text-gray-900 text-sm">{b.name}</p>
                 <p className="text-xs text-gray-500">{b.bank}</p>
                 <p className="font-mono text-xs text-gray-500 mt-0.5">{b.no}</p>
               </div>
-              <span className={`text-xs px-2 py-0.5 rounded font-bold ${b.currency==="USD"?"bg-green-500/20 text-green-400":"bg-blue-500/20 text-blue-400"}`}>{b.currency}</span>
+              <span className={`text-xs px-2 py-0.5 rounded font-bold ${b.currency==="USD"?"bg-green-500/20 text-green-700":"bg-blue-500/20 text-blue-700"}`}>{b.currency}</span>
             </div>
-            <p className={`text-2xl font-black ${b.currency==="USD"?"text-green-400":"text-white"}`}>
+            <p className={`text-2xl font-black ${b.currency==="USD"?"text-green-700":"text-gray-900"}`}>
               {b.currency==="USD" ? `$ ${b.balance.toLocaleString()}` : IDR(b.balance)}
             </p>
             {b.currency==="USD" && <p className="text-xs text-gray-500 mt-1">≈ {IDR(b.balance*15560)}</p>}
@@ -51,8 +51,8 @@ export default function Banks() {
                 <td className="text-xs text-gray-500">{t.date}</td>
                 <td>{t.desc}</td>
                 <td className="text-xs text-gray-400">{t.acc}</td>
-                <td className="text-right text-red-400">{t.debit>0?IDR(t.debit):t.usd_credit?"":" "}</td>
-                <td className="text-right text-green-400">
+                <td className="text-right text-red-700">{t.debit>0?IDR(t.debit):t.usd_credit?"":" "}</td>
+                <td className="text-right text-green-700">
                   {t.credit>0?IDR(t.credit):t.usd_credit?`$ ${t.usd_credit.toLocaleString()}`:" "}
                 </td>
               </tr>

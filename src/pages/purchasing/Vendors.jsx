@@ -89,8 +89,8 @@ export default function Vendors() {
         actions={canSubmit && <Btn onClick={openAdd}>{isAdmin?"+ Tambah Vendor":"📤 Ajukan Vendor Baru"}</Btn>} />
 
       {isAdmin && pendingCount > 0 && (
-        <div className="mb-4 flex items-center justify-between bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
-          <span className="text-amber-300 text-sm">⏳ <strong>{pendingCount} vendor baru</strong> menunggu persetujuan</span>
+        <div className="mb-4 flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          <span className="text-amber-700 text-sm">⏳ <strong>{pendingCount} vendor baru</strong> menunggu persetujuan</span>
           <Btn size="xs" onClick={() => navigate("/admin/mdm")}>Tinjau →</Btn>
         </div>
       )}
@@ -98,13 +98,13 @@ export default function Vendors() {
       <Card>
         <div className="mb-4"><SearchBar value={search} onChange={setSearch} placeholder="Cari nama, kategori…" /></div>
         <Table onRowClick={setSelected} columns={[
-          { key:"code",         label:"Kode",       render:v=><span className="font-mono text-xs text-blue-400">{v||"—"}</span> },
+          { key:"code",         label:"Kode",       render:v=><span className="font-mono text-xs text-blue-700">{v||"—"}</span> },
           { key:"name",         label:"Nama Vendor", render:(v,r)=><span className="flex items-center gap-2">{v}<MDMStatusBadge record={r}/></span> },
           { key:"category",     label:"Kategori",   render:v=><span className="text-xs text-gray-400">{v}</span> },
           { key:"contact",      label:"Kontak"      },
           { key:"payment_terms",label:"Terms"       },
-          { key:"ap_balance",   label:"Saldo AP",   right:true, render:v=><span className={v>0?"font-bold text-amber-300":"text-gray-500"}>{IDR(v||0)}</span> },
-          { key:"open_bills",   label:"Tagihan",    right:true, render:v=>v>0?<span className="text-amber-400 font-bold">{v}</span>:<span className="text-gray-600">0</span> },
+          { key:"ap_balance",   label:"Saldo AP",   right:true, render:v=><span className={v>0?"font-bold text-amber-700":"text-gray-500"}>{IDR(v||0)}</span> },
+          { key:"open_bills",   label:"Tagihan",    right:true, render:v=>v>0?<span className="text-amber-700 font-bold">{v}</span>:<span className="text-gray-600">0</span> },
           { key:"_mdmStatus",   label:"",           render:(_,r)=>isAdmin&&r._mdmStatus==="pending"?<MDMApproveInline record={r} />:null },
         ]} data={filtered} empty="Belum ada vendor" />
       </Card>
@@ -113,7 +113,7 @@ export default function Vendors() {
         <Modal title={selected.name} subtitle={selected.category} onClose={()=>setSelected(null)}>
           <div className="p-5 space-y-4">
             {selected._mdmStatus==="pending" && (
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-sm text-amber-300 flex items-center gap-2">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700 flex items-center gap-2">
                 ⏳ <span>Menunggu persetujuan admin sebelum dapat digunakan dalam PO.</span>
               </div>
             )}
@@ -121,7 +121,7 @@ export default function Vendors() {
               {[["Kode",selected.code||"—"],["Kontak",selected.contact||"—"],["Email",selected.email||"—"],
                 ["Telepon",selected.phone||"—"],["Terms Bayar",selected.payment_terms||"—"],
                 ["Saldo AP",IDR(selected.ap_balance||0)]].map(([k,v])=>(
-                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-white">{v}</p></div>
+                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-gray-900">{v}</p></div>
               ))}
             </div>
             <div className="flex justify-end gap-2 flex-wrap">
@@ -141,10 +141,10 @@ export default function Vendors() {
           onClose={()=>setShowForm(false)} width="max-w-xl">
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
             {!editing && !isAdmin && (
-              <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-sm">
+              <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm">
                 <span className="text-xl">⏳</span>
                 <div>
-                  <p className="font-bold text-amber-300">Memerlukan Persetujuan Admin</p>
+                  <p className="font-bold text-amber-700">Memerlukan Persetujuan Admin</p>
                   <p className="text-xs text-gray-400">Vendor baru perlu divalidasi sebelum dapat digunakan dalam Purchase Order.</p>
                 </div>
               </div>
@@ -152,14 +152,14 @@ export default function Vendors() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField label="Nama Vendor" required>
                 <input value={form.name} onChange={set("name")} className={`erp-input ${errors.name?"border-red-500":""}`} placeholder="Nama perusahaan pemasok" />
-                {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
+                {errors.name && <p className="text-xs text-red-700 mt-1">{errors.name}</p>}
               </FormField>
               <FormField label="Kode Vendor">
                 <input value={form.code} onChange={set("code")} className="erp-input" placeholder="Contoh: VEND-010" />
               </FormField>
               <FormField label="Nama Kontak" required>
                 <input value={form.contact} onChange={set("contact")} className={`erp-input ${errors.contact?"border-red-500":""}`} placeholder="Nama PIC" />
-                {errors.contact && <p className="text-xs text-red-400 mt-1">{errors.contact}</p>}
+                {errors.contact && <p className="text-xs text-red-700 mt-1">{errors.contact}</p>}
               </FormField>
               <FormField label="Kategori">
                 <select value={form.category} onChange={set("category")} className="erp-select">
@@ -181,7 +181,7 @@ export default function Vendors() {
                 <input value={form.bank_account} onChange={set("bank_account")} className="erp-input" placeholder="BCA — 1234567890" />
               </FormField>
             </div>
-            <div className="flex justify-end gap-2 pt-2 border-t border-gray-800">
+            <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
               <Btn variant="secondary" type="button" onClick={()=>setShowForm(false)}>Batal</Btn>
               <Btn type="submit">{editing?"💾 Simpan":(isAdmin?"✅ Tambah Vendor":"📤 Kirim Pengajuan")}</Btn>
             </div>

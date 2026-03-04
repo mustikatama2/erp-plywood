@@ -56,10 +56,10 @@ function NewBillModal({ onClose, onSave }) {
           <DocumentParserButton onExtracted={handleExtracted} />
         </div>
 
-        <div className="border-t border-gray-800 pt-4 space-y-3">
+        <div className="border-t border-gray-200 pt-4 space-y-3">
           {/* Vendor select */}
           <div>
-            <label className="erp-label">Vendor <span className="text-red-400">*</span></label>
+            <label className="erp-label">Vendor <span className="text-red-700">*</span></label>
             <select value={form.vendor_id} onChange={set("vendor_id")} className="erp-input">
               <option value="">-- Pilih Vendor --</option>
               {VENDORS.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -68,7 +68,7 @@ function NewBillModal({ onClose, onSave }) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="erp-label">No. Invoice Vendor <span className="text-red-400">*</span></label>
+              <label className="erp-label">No. Invoice Vendor <span className="text-red-700">*</span></label>
               <input value={form.inv_no} onChange={set("inv_no")} className="erp-input" placeholder="SINV-2026-001" />
             </div>
             <div>
@@ -96,7 +96,7 @@ function NewBillModal({ onClose, onSave }) {
           </div>
 
           <div>
-            <label className="erp-label">Jumlah Total <span className="text-red-400">*</span></label>
+            <label className="erp-label">Jumlah Total <span className="text-red-700">*</span></label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{form.currency === "USD" ? "$" : "Rp"}</span>
               <input
@@ -108,13 +108,13 @@ function NewBillModal({ onClose, onSave }) {
           </div>
 
           {form.notes && (
-            <div className="bg-gray-800/50 rounded-lg p-3 text-xs text-gray-400">
+            <div className="bg-gray-100 rounded-lg p-3 text-xs text-gray-400">
               📝 Catatan AI: {form.notes}
             </div>
           )}
         </div>
 
-        <div className="flex justify-end gap-2 pt-2 border-t border-gray-800">
+        <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
           <Btn variant="secondary" onClick={onClose}>Batal</Btn>
           <Btn onClick={handleSave} disabled={saving}>
             {saving ? "Menyimpan…" : "💾 Simpan Tagihan"}
@@ -155,8 +155,8 @@ export default function AP() {
       />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <KPICard label="Total Hutang"   sublabel="AP Outstanding" value={IDR(total)}   color="text-amber-300" icon="📥" />
-        <KPICard label="Jatuh Tempo"    sublabel="Overdue"        value={IDR(overdue)} color="text-red-400"   icon="🔴" />
+        <KPICard label="Total Hutang"   sublabel="AP Outstanding" value={IDR(total)}   color="text-amber-700" icon="📥" />
+        <KPICard label="Jatuh Tempo"    sublabel="Overdue"        value={IDR(overdue)} color="text-red-700"   icon="🔴" />
         <KPICard label="Tagihan Terbuka"sublabel="Open Bills"     value={enriched.filter(i=>i.status!=="Paid").length} icon="📄" />
         <KPICard label="Vendor Aktif"   sublabel="with balance"   value={new Set(enriched.filter(i=>i.balance>0).map(i=>i.vendor_id)).size} icon="🏢" />
       </div>
@@ -164,7 +164,7 @@ export default function AP() {
       {/* AI parser hint banner */}
       <div className="mb-4 flex items-center gap-3 px-4 py-2.5 bg-blue-500/8 border border-blue-500/15 rounded-xl text-sm">
         <span>🤖</span>
-        <span className="text-gray-400">Tagihan baru? Klik <strong className="text-white">+ Tagihan Baru</strong> lalu gunakan <strong className="text-blue-400">Parse Otomatis AI</strong> — tempel teks invoice, form terisi sendiri.</span>
+        <span className="text-gray-400">Tagihan baru? Klik <strong className="text-gray-900">+ Tagihan Baru</strong> lalu gunakan <strong className="text-blue-700">Parse Otomatis AI</strong> — tempel teks invoice, form terisi sendiri.</span>
       </div>
 
       <Card>
@@ -173,7 +173,7 @@ export default function AP() {
           <div className="flex gap-1.5 flex-wrap">
             {STATUSES.map(s=>(
               <button key={s} onClick={()=>setFilter(s)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${filter===s?"bg-blue-600 text-white":"bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${filter===s?"bg-blue-600 text-white":"bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
                 {s==="All"?"Semua":s==="Unpaid"?"Belum Bayar":s==="Overdue"?"Jatuh Tempo":"Lunas"}{" "}
                 <span className="ml-1 opacity-70">{s==="All"?enriched.length:enriched.filter(i=>i.status===s).length}</span>
               </button>
@@ -181,16 +181,16 @@ export default function AP() {
           </div>
         </div>
         <Table onRowClick={setSelected} columns={[
-          { key:"inv_no",     label:"Bill No",      render:v=><span className="font-mono font-bold text-blue-400">{v}</span> },
+          { key:"inv_no",     label:"Bill No",      render:v=><span className="font-mono font-bold text-blue-700">{v}</span> },
           { key:"vendor",     label:"Vendor",       render:v=>v?.name.split(" ").slice(0,3).join(" ") },
           { key:"date",       label:"Tanggal",      render:DATE },
           { key:"due_date",   label:"Jatuh Tempo",  render:(v,r)=>{
             const od = new Date(v)<new Date()&&r.status!=="Paid";
-            return <span className={od?"text-red-400 font-bold":"text-gray-300"}>{DATE(v)}{od?" ⚠️":""}</span>;
+            return <span className={od?"text-red-700 font-bold":"text-gray-700"}>{DATE(v)}{od?" ⚠️":""}</span>;
           }},
           { key:"description",label:"Deskripsi",    render:v=><span className="text-xs text-gray-400">{v}</span> },
           { key:"total",      label:"Total",        right:true, render:v=><span className="font-mono">{IDR(v)}</span> },
-          { key:"balance",    label:"Sisa",         right:true, render:v=><span className={v>0?"font-black text-amber-300":"text-gray-500"}>{IDR(v)}</span> },
+          { key:"balance",    label:"Sisa",         right:true, render:v=><span className={v>0?"font-black text-amber-700":"text-gray-500"}>{IDR(v)}</span> },
           { key:"status",     label:"Status",       render:v=><Badge status={v} /> },
         ]} data={filtered} />
       </Card>
@@ -208,7 +208,7 @@ export default function AP() {
             </div>
             <div className="erp-card p-4 flex justify-between items-center">
               <span className="text-sm text-gray-400">Sisa Tagihan</span>
-              <span className={`text-2xl font-black ${selected.balance>0?"text-amber-300":"text-green-400"}`}>{IDR(selected.balance)}</span>
+              <span className={`text-2xl font-black ${selected.balance>0?"text-amber-700":"text-green-700"}`}>{IDR(selected.balance)}</span>
             </div>
             <div className="flex justify-end gap-2">
               <Btn variant="secondary" onClick={()=>setSelected(null)}>Tutup</Btn>

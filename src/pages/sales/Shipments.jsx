@@ -20,8 +20,8 @@ export default function Shipments() {
   const docStatus = (docs) => {
     const pending = docs.filter(d => d.status === "Pending").length;
     return pending > 0
-      ? <span className="text-amber-400 text-xs font-bold">{pending} pending</span>
-      : <span className="text-green-400 text-xs font-bold">✓ Complete</span>;
+      ? <span className="text-amber-700 text-xs font-bold">{pending} pending</span>
+      : <span className="text-green-700 text-xs font-bold">✓ Complete</span>;
   };
 
   return (
@@ -31,7 +31,7 @@ export default function Shipments() {
       <Card>
         <div className="mb-4"><SearchBar value={search} onChange={setSearch} placeholder="Search shipment no, vessel…" /></div>
         <Table onRowClick={setSelected} columns={[
-          { key:"shipment_no", label:"Shipment No",   render:v=><span className="font-mono font-bold text-blue-400">{v}</span> },
+          { key:"shipment_no", label:"Shipment No",   render:v=><span className="font-mono font-bold text-blue-700">{v}</span> },
           { key:"customer",    label:"Customer",      render:v=>v?.name.split(" ").slice(0,3).join(" ") },
           { key:"date",        label:"Date",          render:DATE },
           { key:"vessel",      label:"Vessel"         },
@@ -51,7 +51,7 @@ export default function Shipments() {
                 ["Port of Loading",selected.port_loading],["Port of Discharge",selected.port_discharge],
                 ["Container",selected.container],["Gross Weight",selected.gross_weight],
                 ["CBM",`${selected.cbm} m³`],["Status",selected.status]].map(([k,v])=>(
-                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-white">{v||"—"}</p></div>
+                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-gray-900">{v||"—"}</p></div>
               ))}
             </div>
 
@@ -66,7 +66,7 @@ export default function Shipments() {
                       <td><span className="font-mono text-xs">{d.no}</span></td>
                       <td>
                         <span className={`text-xs font-bold ${
-                          d.status==="Valid"||d.status==="Received"||d.status==="Done" ? "text-green-400" : "text-amber-400"
+                          d.status==="Valid"||d.status==="Received"||d.status==="Done" ? "text-green-700" : "text-amber-700"
                         }`}>{d.status}</span>
                       </td>
                     </tr>

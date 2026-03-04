@@ -43,10 +43,10 @@ export default function Dashboard() {
                   <span className="text-xl">🔴</span>
                   <div>
                     <p className="text-sm font-bold text-red-300">Piutang Jatuh Tempo (Overdue AR)</p>
-                    <p className="text-xs text-red-400">{overdueAR.length} invoice belum dibayar · Total {IDR(overdueAR.reduce((s,i)=>s+i.balance*(i.currency==="USD"?FX:1),0))}</p>
+                    <p className="text-xs text-red-700">{overdueAR.length} invoice belum dibayar · Total {IDR(overdueAR.reduce((s,i)=>s+i.balance*(i.currency==="USD"?FX:1),0))}</p>
                   </div>
                 </div>
-                <span className="text-red-400 group-hover:translate-x-1 transition-transform">→</span>
+                <span className="text-red-700 group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </button>
           )}
@@ -56,11 +56,11 @@ export default function Dashboard() {
                 <div className="flex items-center gap-3">
                   <span className="text-xl">⚠️</span>
                   <div>
-                    <p className="text-sm font-bold text-amber-300">Tagihan Vendor Jatuh Tempo</p>
-                    <p className="text-xs text-amber-400">{overdueAP.length} tagihan belum dibayar · {IDR(overdueAP.reduce((s,i)=>s+i.balance,0))}</p>
+                    <p className="text-sm font-bold text-amber-700">Tagihan Vendor Jatuh Tempo</p>
+                    <p className="text-xs text-amber-700">{overdueAP.length} tagihan belum dibayar · {IDR(overdueAP.reduce((s,i)=>s+i.balance,0))}</p>
                   </div>
                 </div>
-                <span className="text-amber-400 group-hover:translate-x-1 transition-transform">→</span>
+                <span className="text-amber-700 group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </button>
           )}
@@ -71,10 +71,10 @@ export default function Dashboard() {
                   <span className="text-xl">📦</span>
                   <div>
                     <p className="text-sm font-bold text-blue-300">Stok Hampir Habis</p>
-                    <p className="text-xs text-blue-400">{lowStock.length} produk di bawah batas reorder · {lowStock.map(p=>p.name.split(" ").slice(0,2).join(" ")).join(", ")}</p>
+                    <p className="text-xs text-blue-700">{lowStock.length} produk di bawah batas reorder · {lowStock.map(p=>p.name.split(" ").slice(0,2).join(" ")).join(", ")}</p>
                   </div>
                 </div>
-                <span className="text-blue-400 group-hover:translate-x-1 transition-transform">→</span>
+                <span className="text-blue-700 group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </button>
           )}
@@ -95,11 +95,11 @@ export default function Dashboard() {
           <div className="flex items-center gap-2">
             <span className="text-lg">🤖</span>
             <div>
-              <h3 className="text-sm font-bold text-white">Deteksi Anomali AI</h3>
+              <h3 className="text-sm font-bold text-gray-900">Deteksi Anomali AI</h3>
               <p className="text-xs text-gray-500">Smart alerts · diperbarui otomatis</p>
             </div>
           </div>
-          <button onClick={() => navigate("/ai")} className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+          <button onClick={() => navigate("/ai")} className="text-xs text-blue-700 hover:text-blue-300 transition-colors">
             Buka Asisten AI →
           </button>
         </div>
@@ -108,13 +108,13 @@ export default function Dashboard() {
 
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-        <KPICard label="Pendapatan Bulan Ini" sublabel="Revenue" value={IDR(cur.revenue)} color="text-green-400" icon="💰" trend={revTrend} />
-        <KPICard label="Laba Kotor"           sublabel="Gross Profit" value={IDR(cur.gross)}   color="text-blue-400"  icon="📈" sub={`Margin ${PCT(cur.gross/cur.revenue*100)}`} />
-        <KPICard label="Laba Bersih"          sublabel="Net Income"   value={IDR(cur.net)}     color="text-purple-400"icon="🎯" sub={`NPM ${PCT(cur.net/cur.revenue*100)}`} />
+        <KPICard label="Pendapatan Bulan Ini" sublabel="Revenue" value={IDR(cur.revenue)} color="text-green-700" icon="💰" trend={revTrend} />
+        <KPICard label="Laba Kotor"           sublabel="Gross Profit" value={IDR(cur.gross)}   color="text-blue-700"  icon="📈" sub={`Margin ${PCT(cur.gross/cur.revenue*100)}`} />
+        <KPICard label="Laba Bersih"          sublabel="Net Income"   value={IDR(cur.net)}     color="text-purple-700"icon="🎯" sub={`NPM ${PCT(cur.net/cur.revenue*100)}`} />
         <KPICard label="Total Kas & Bank"     sublabel="Cash & Bank"  value={IDR(totalCash)}   color="text-teal-400"  icon="🏦" sub={`${BANK_ACCOUNTS.length} rekening`} />
-        <KPICard label="Piutang Belum Terima" sublabel="AR Outstanding" value={IDR(totalAR)} color={overdueAR.length?"text-red-400":"text-white"} icon="📤"
+        <KPICard label="Piutang Belum Terima" sublabel="AR Outstanding" value={IDR(totalAR)} color={overdueAR.length?"text-red-700":"text-gray-900"} icon="📤"
           sub={`${AR_INVOICES.filter(i=>i.status!=="Paid").length} invoice terbuka`} />
-        <KPICard label="Hutang Belum Bayar"   sublabel="AP Outstanding" value={IDR(totalAP)} color={overdueAP.length?"text-amber-400":"text-white"} icon="📥"
+        <KPICard label="Hutang Belum Bayar"   sublabel="AP Outstanding" value={IDR(totalAP)} color={overdueAP.length?"text-amber-700":"text-gray-900"} icon="📥"
           sub={`${AP_INVOICES.filter(i=>i.status!=="Paid").length} tagihan terbuka`} />
       </div>
 
@@ -140,12 +140,12 @@ export default function Dashboard() {
           <div className="space-y-1 text-sm">
             <p className="text-xs text-gray-600 uppercase tracking-wider font-bold mb-2">Aset</p>
             <StatRow label="Kas & Bank"    value={IDR(BALANCE_SHEET.assets.cash)}      color="text-teal-400" />
-            <StatRow label="Piutang"  sublabel="AR" value={IDR(BALANCE_SHEET.assets.ar)}   color="text-amber-300" />
+            <StatRow label="Piutang"  sublabel="AR" value={IDR(BALANCE_SHEET.assets.ar)}   color="text-amber-700" />
             <StatRow label="Stok / Inventori"         value={IDR(BALANCE_SHEET.assets.inventory)} />
             <StatRow label="Aset Tetap (net)"         value={IDR(BALANCE_SHEET.assets.fixed_net)} />
-            <StatRow label="Total Aset" value={IDR(Object.values(BALANCE_SHEET.assets).reduce((a,b)=>a+b,0))} color="text-green-400" border={false} />
-            <div className="border-t border-gray-700 my-2"/>
-            <StatRow label="Total Ekuitas" sublabel="Equity" value={IDR(Object.values(BALANCE_SHEET.equity).reduce((a,b)=>a+b,0))} color="text-blue-400" border={false} />
+            <StatRow label="Total Aset" value={IDR(Object.values(BALANCE_SHEET.assets).reduce((a,b)=>a+b,0))} color="text-green-700" border={false} />
+            <div className="border-t border-gray-200 my-2"/>
+            <StatRow label="Total Ekuitas" sublabel="Equity" value={IDR(Object.values(BALANCE_SHEET.equity).reduce((a,b)=>a+b,0))} color="text-blue-700" border={false} />
           </div>
         </Card>
       </div>
@@ -163,13 +163,13 @@ export default function Dashboard() {
                 const cust = CUSTOMERS.find(c=>c.id===so.customer_id);
                 return (
                   <button key={so.id} onClick={()=>navigate("/sales/orders")}
-                    className="w-full flex items-center justify-between py-2.5 border-b border-gray-800/50 text-xs hover:bg-gray-800/30 rounded px-1 transition-colors group">
+                    className="w-full flex items-center justify-between py-2.5 border-b border-gray-200/50 text-xs hover:bg-gray-100/30 rounded px-1 transition-colors group">
                     <div className="text-left">
-                      <p className="font-bold text-white group-hover:text-blue-300">{so.so_no}</p>
+                      <p className="font-bold text-gray-900 group-hover:text-blue-300">{so.so_no}</p>
                       <p className="text-gray-500">{cust?.name.split(" ").slice(0,3).join(" ")}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-white">{so.currency} {so.total.toLocaleString()}</p>
+                      <p className="font-bold text-gray-900">{so.currency} {so.total.toLocaleString()}</p>
                       <span className={badge(so.status)}>{so.status}</span>
                     </div>
                   </button>
@@ -182,14 +182,14 @@ export default function Dashboard() {
         {/* AR Aging */}
         <Card title="Umur Piutang" subtitle="AR Aging — siapa yang perlu ditagih">
           {[
-            { label:"Belum Jatuh Tempo", sublabel:"Current ≤ 30 hari", items:AR_INVOICES.filter(i=>i.status==="Unpaid"), color:"text-green-400", dot:"🟢" },
-            { label:"Dibayar Sebagian",  sublabel:"Partial payment",    items:AR_INVOICES.filter(i=>i.status==="Partial"), color:"text-amber-400", dot:"🟡" },
-            { label:"Sudah Jatuh Tempo", sublabel:"Overdue > 60 hari",  items:AR_INVOICES.filter(i=>i.status==="Overdue"), color:"text-red-400",   dot:"🔴" },
+            { label:"Belum Jatuh Tempo", sublabel:"Current ≤ 30 hari", items:AR_INVOICES.filter(i=>i.status==="Unpaid"), color:"text-green-700", dot:"🟢" },
+            { label:"Dibayar Sebagian",  sublabel:"Partial payment",    items:AR_INVOICES.filter(i=>i.status==="Partial"), color:"text-amber-700", dot:"🟡" },
+            { label:"Sudah Jatuh Tempo", sublabel:"Overdue > 60 hari",  items:AR_INVOICES.filter(i=>i.status==="Overdue"), color:"text-red-700",   dot:"🔴" },
           ].map(({label,sublabel,items,color,dot})=>(
             <button key={label} onClick={()=>navigate("/finance/ar")}
-              className="w-full flex items-center justify-between py-2.5 border-b border-gray-800/50 text-sm hover:bg-gray-800/30 rounded px-1 transition-colors">
+              className="w-full flex items-center justify-between py-2.5 border-b border-gray-200/50 text-sm hover:bg-gray-100/30 rounded px-1 transition-colors">
               <div className="text-left">
-                <p className="font-medium text-white flex items-center gap-1.5">{dot} {label}</p>
+                <p className="font-medium text-gray-900 flex items-center gap-1.5">{dot} {label}</p>
                 <p className="text-xs text-gray-500">{sublabel} · {items.length} invoice</p>
               </div>
               <span className={`font-black ${color}`}>
@@ -204,26 +204,26 @@ export default function Dashboard() {
           <div className="space-y-3">
             {PRODUCTS.filter(p=>p.category==="Plywood").slice(0,4).map(p => (
               <button key={p.id} onClick={()=>navigate("/inventory/stock")}
-                className="w-full flex items-center gap-3 py-1.5 hover:bg-gray-800/30 rounded px-1 transition-colors group">
+                className="w-full flex items-center gap-3 py-1.5 hover:bg-gray-100/30 rounded px-1 transition-colors group">
                 <div className="flex-1 text-left">
-                  <p className="text-xs text-gray-300 group-hover:text-white">{p.name}</p>
-                  <div className="w-full bg-gray-800 rounded-full h-1.5 mt-1">
+                  <p className="text-xs text-gray-700 group-hover:text-gray-900">{p.name}</p>
+                  <div className="w-full bg-gray-100 rounded-full h-1.5 mt-1">
                     <div className={`h-1.5 rounded-full ${p.stock_qty<p.reorder?"bg-red-500":"bg-blue-500"}`}
                       style={{width:`${Math.min(100,(p.stock_qty/(p.reorder*3))*100)}%`}} />
                   </div>
                 </div>
-                <span className={`text-sm font-black w-20 text-right flex-shrink-0 ${p.stock_qty<p.reorder?"text-red-400":"text-gray-300"}`}>
+                <span className={`text-sm font-black w-20 text-right flex-shrink-0 ${p.stock_qty<p.reorder?"text-red-700":"text-gray-700"}`}>
                   {p.stock_qty.toLocaleString()} {p.stock_qty<p.reorder?"⚠️":""}
                 </span>
               </button>
             ))}
-            <div className="border-t border-gray-800 pt-3 grid grid-cols-2 gap-2 text-center">
+            <div className="border-t border-gray-200 pt-3 grid grid-cols-2 gap-2 text-center">
               <div className="erp-card p-2">
-                <p className="text-lg font-black text-white">{EMPLOYEES.length}</p>
+                <p className="text-lg font-black text-gray-900">{EMPLOYEES.length}</p>
                 <p className="text-xs text-gray-500">Karyawan</p>
               </div>
               <div className="erp-card p-2">
-                <p className="text-lg font-black text-white">{BANK_ACCOUNTS.length}</p>
+                <p className="text-lg font-black text-gray-900">{BANK_ACCOUNTS.length}</p>
                 <p className="text-xs text-gray-500">Rekening Bank</p>
               </div>
             </div>
@@ -237,11 +237,11 @@ export default function Dashboard() {
           <div className="flex items-center gap-2">
             <span className="text-lg">📈</span>
             <div>
-              <h3 className="text-sm font-bold text-white">Proyeksi Arus Kas 90 Hari</h3>
+              <h3 className="text-sm font-bold text-gray-900">Proyeksi Arus Kas 90 Hari</h3>
               <p className="text-xs text-gray-500">Berdasarkan AR/AP jatuh tempo · narasi AI</p>
             </div>
           </div>
-          <button onClick={() => navigate("/ai")} className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+          <button onClick={() => navigate("/ai")} className="text-xs text-blue-700 hover:text-blue-300 transition-colors">
             Analisis Penuh →
           </button>
         </div>

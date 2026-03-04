@@ -21,30 +21,30 @@ export const TODAY = () => new Date().toISOString().slice(0,10);
 
 export const STATUS_COLORS = {
   // General
-  Draft:    "bg-gray-700 text-gray-300",
-  Pending:  "bg-amber-500/20 text-amber-400",
-  Approved: "bg-blue-500/20 text-blue-400",
-  Posted:   "bg-blue-500/20 text-blue-400",
-  Sent:     "bg-purple-500/20 text-purple-400",
-  Active:   "bg-green-500/20 text-green-400",
-  Closed:   "bg-gray-600 text-gray-400",
-  Cancelled:"bg-red-500/20 text-red-400",
+  Draft:    "bg-gray-100 text-gray-600",
+  Pending:  "bg-amber-50 text-amber-700 border border-amber-200",
+  Approved: "bg-blue-50 text-blue-700 border border-blue-200",
+  Posted:   "bg-blue-50 text-blue-700 border border-blue-200",
+  Sent:     "bg-purple-50 text-purple-700 border border-purple-200",
+  Active:   "bg-green-50 text-green-700 border border-green-200",
+  Closed:   "bg-gray-100 text-gray-500",
+  Cancelled:"bg-red-50 text-red-700 border border-red-200",
   // Invoice
-  Unpaid:   "bg-red-500/20 text-red-400",
-  Partial:  "bg-amber-500/20 text-amber-400",
-  Paid:     "bg-green-500/20 text-green-400",
-  Overdue:  "bg-red-600/30 text-red-300 font-bold",
+  Unpaid:   "bg-red-50 text-red-700 border border-red-200",
+  Partial:  "bg-amber-50 text-amber-700 border border-amber-200",
+  Paid:     "bg-green-50 text-green-700 border border-green-200",
+  Overdue:  "bg-red-100 text-red-800 border border-red-300 font-bold",
   // WO
-  "In Progress": "bg-blue-500/20 text-blue-400",
-  Completed:     "bg-green-500/20 text-green-400",
-  Planned:       "bg-gray-700 text-gray-300",
-  Received:      "bg-green-500/20 text-green-400",
-  Shipped:       "bg-purple-500/20 text-purple-400",
-  Confirmed:     "bg-blue-500/20 text-blue-400",
+  "In Progress": "bg-blue-50 text-blue-700 border border-blue-200",
+  Completed:     "bg-green-50 text-green-700 border border-green-200",
+  Planned:       "bg-gray-100 text-gray-600",
+  Received:      "bg-green-50 text-green-700 border border-green-200",
+  Shipped:       "bg-purple-50 text-purple-700 border border-purple-200",
+  Confirmed:     "bg-blue-50 text-blue-700 border border-blue-200",
 };
 
 export const badge = (status) => {
-  const c = STATUS_COLORS[status] || "bg-gray-700 text-gray-300";
+  const c = STATUS_COLORS[status] || "bg-gray-100 text-gray-600";
   return `inline-flex items-center text-xs px-2 py-0.5 rounded font-medium ${c}`;
 };
 

@@ -78,7 +78,7 @@ export default function SalesOrders() {
       <div className="flex gap-2 mb-4 flex-wrap">
         {STATUSES.map(s=>(
           <button key={s} onClick={()=>setStatusFilter(s)}
-            className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${statusFilter===s?"bg-blue-600 text-white":"bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+            className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${statusFilter===s?"bg-blue-600 text-white":"bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
             {s} <span className="opacity-60">{s==="All"?orders.length:orders.filter(o=>o.status===s).length}</span>
           </button>
         ))}
@@ -87,7 +87,7 @@ export default function SalesOrders() {
       <Card>
         <div className="mb-4"><SearchBar value={search} onChange={setSearch} placeholder="Cari nomor SO, customer…" /></div>
         <Table onRowClick={setSelected} columns={[
-          { key:"so_no",    label:"Nomor SO",    render:v=><span className="font-mono font-bold text-blue-400">{v}</span> },
+          { key:"so_no",    label:"Nomor SO",    render:v=><span className="font-mono font-bold text-blue-700">{v}</span> },
           { key:"customer", label:"Customer",    render:v=>v?.name.split(" ").slice(0,3).join(" ")||"—" },
           { key:"date",     label:"Tgl. Buat",   render:DATE },
           { key:"delivery_date",label:"Tgl. Kirim",render:DATE },
@@ -105,7 +105,7 @@ export default function SalesOrders() {
               {[["Customer",selected.customer?.name],["Tgl. Dibuat",DATE(selected.date)],["Tgl. Kirim",DATE(selected.delivery_date)],
                 ["Incoterm",selected.incoterm],["Terms Bayar",selected.payment_terms],["Mata Uang",selected.currency],
                 ["Status",selected.status],["Catatan",selected.notes||"—"]].map(([k,v])=>(
-                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-white">{v}</p></div>
+                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-gray-900">{v}</p></div>
               ))}
             </div>
             <div>
@@ -117,7 +117,7 @@ export default function SalesOrders() {
                     <td className="text-right">{selected.currency} {l.unit_price.toFixed(2)}</td>
                     <td className="text-right font-bold">{selected.currency} {l.total.toLocaleString()}</td></tr>
                 ))}</tbody>
-                <tfoot><tr className="font-black text-white"><td colSpan={3} className="text-right px-4 py-2">TOTAL</td>
+                <tfoot><tr className="font-black text-gray-900"><td colSpan={3} className="text-right px-4 py-2">TOTAL</td>
                   <td className="text-right px-4 py-2">{selected.currency} {selected.total.toLocaleString()}</td></tr></tfoot>
               </table>
             </div>
@@ -142,7 +142,7 @@ export default function SalesOrders() {
                   <option value="">— Pilih Customer —</option>
                   {CUSTOMERS.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
-                {errors.customer_id && <p className="text-xs text-red-400 mt-1">{errors.customer_id}</p>}
+                {errors.customer_id && <p className="text-xs text-red-700 mt-1">{errors.customer_id}</p>}
               </FormField>
               <FormField label="Tanggal Pengiriman">
                 <input type="date" value={form.delivery_date} onChange={setField("delivery_date")} className="erp-input" />
@@ -167,13 +167,13 @@ export default function SalesOrders() {
             {/* Lines */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-bold text-gray-300">Daftar Barang</p>
+                <p className="text-sm font-bold text-gray-700">Daftar Barang</p>
                 <Btn size="xs" variant="secondary" type="button" onClick={addLine}>+ Tambah Baris</Btn>
               </div>
-              {errors.lines && <p className="text-xs text-red-400 mb-2">{errors.lines}</p>}
+              {errors.lines && <p className="text-xs text-red-700 mb-2">{errors.lines}</p>}
               <div className="space-y-2">
                 {form.lines.map((line,i)=>(
-                  <div key={i} className="bg-gray-800/40 rounded-xl p-3 space-y-2">
+                  <div key={i} className="bg-gray-50 rounded-xl p-3 space-y-2">
                     <div className="grid grid-cols-12 gap-2 items-end">
                       <div className="col-span-5">
                         <p className="erp-label">Produk</p>
@@ -198,19 +198,19 @@ export default function SalesOrders() {
                         <input type="number" step="0.01" value={line.unit_price} onChange={setLine(i,"unit_price")} className="erp-input" placeholder="0.00" />
                       </div>
                       <div className="col-span-1 flex justify-center">
-                        {form.lines.length>1 && <button type="button" onClick={()=>removeLine(i)} className="text-red-400 hover:text-red-300 text-xl">×</button>}
+                        {form.lines.length>1 && <button type="button" onClick={()=>removeLine(i)} className="text-red-700 hover:text-red-300 text-xl">×</button>}
                       </div>
                     </div>
                     {line.qty&&line.unit_price&&(
                       <p className="text-right text-xs text-gray-400">
-                        Subtotal: <span className="font-bold text-white">{form.currency} {(Number(line.qty)*Number(line.unit_price)).toLocaleString()}</span>
+                        Subtotal: <span className="font-bold text-gray-900">{form.currency} {(Number(line.qty)*Number(line.unit_price)).toLocaleString()}</span>
                       </p>
                     )}
                   </div>
                 ))}
               </div>
               {form.lines.some(l=>l.qty&&l.unit_price)&&(
-                <div className="text-right mt-2 font-black text-white">
+                <div className="text-right mt-2 font-black text-gray-900">
                   Total: {form.currency} {form.lines.reduce((s,l)=>s+(Number(l.qty)||0)*(Number(l.unit_price)||0),0).toLocaleString()}
                 </div>
               )}
@@ -219,7 +219,7 @@ export default function SalesOrders() {
             <FormField label="Catatan">
               <textarea value={form.notes} onChange={setField("notes")} className="erp-input h-16 resize-none" placeholder="No. L/C, catatan khusus…" />
             </FormField>
-            <div className="flex justify-end gap-2 border-t border-gray-800 pt-4">
+            <div className="flex justify-end gap-2 border-t border-gray-200 pt-4">
               <Btn variant="secondary" type="button" onClick={()=>setShowForm(false)}>Batal</Btn>
               <Btn type="submit">✅ Buat Sales Order</Btn>
             </div>

@@ -129,7 +129,7 @@ function generateMovements() {
 
 const ALL_MOVES = generateMovements();
 const TYPE_LABEL = { OPENING: "Saldo Awal", IN: "Masuk", OUT: "Keluar", ADJ: "Penyesuaian" };
-const TYPE_COLOR = { OPENING: "text-blue-400", IN: "text-green-400", OUT: "text-red-400", ADJ: "text-amber-400" };
+const TYPE_COLOR = { OPENING: "text-blue-700", IN: "text-green-700", OUT: "text-red-700", ADJ: "text-amber-700" };
 
 // ── SKU Summary ───────────────────────────────────────────────────────────────
 function skuSummary(moves) {
@@ -196,9 +196,9 @@ export default function Movements() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         <KPICard label="Total Pergerakan"  sublabel="All Movements" value={ALL_MOVES.filter(m=>m.type!=="OPENING").length}    icon="🔄" />
-        <KPICard label="Total Masuk"       sublabel="Stock In"      value={`+${totalIn.toLocaleString()}`}      color="text-green-400" icon="📦" />
-        <KPICard label="Total Keluar"      sublabel="Stock Out"     value={`-${totalOut.toLocaleString()}`}     color="text-red-400"   icon="📤" />
-        <KPICard label="Penyesuaian"       sublabel="Adjustments"   value={totalAdj}                            color="text-amber-400" icon="⚖️" />
+        <KPICard label="Total Masuk"       sublabel="Stock In"      value={`+${totalIn.toLocaleString()}`}      color="text-green-700" icon="📦" />
+        <KPICard label="Total Keluar"      sublabel="Stock Out"     value={`-${totalOut.toLocaleString()}`}     color="text-red-700"   icon="📤" />
+        <KPICard label="Penyesuaian"       sublabel="Adjustments"   value={totalAdj}                            color="text-amber-700" icon="⚖️" />
       </div>
 
       {/* Top SKU movement chart */}
@@ -233,7 +233,7 @@ export default function Movements() {
           <div className="flex gap-1 flex-wrap">
             {["All","IN","OUT","ADJ","OPENING"].map(t=>(
               <button key={t} onClick={()=>setTypeFilter(t)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${typeFilter===t?"bg-blue-600 text-white":"bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${typeFilter===t?"bg-blue-600 text-white":"bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
                 {t==="All"?"Semua":TYPE_LABEL[t]||t}
               </button>
             ))}
@@ -272,13 +272,13 @@ export default function Movements() {
                   <tr key={s.product_id}
                     className="cursor-pointer"
                     onClick={() => { setSkuFilter(s.product_id); setView("detail"); }}>
-                    <td className="font-semibold text-white">{s.name}</td>
+                    <td className="font-semibold text-gray-900">{s.name}</td>
                     <td><span className="text-xs text-gray-500">{s.category}</span></td>
                     <td className="text-right font-mono text-gray-400">{NUM(s.opening)}</td>
-                    <td className="text-right font-mono text-green-400">{s.totalIn > 0 ? `+${NUM(s.totalIn)}` : "—"}</td>
-                    <td className="text-right font-mono text-red-400">{s.totalOut > 0 ? `-${NUM(s.totalOut)}` : "—"}</td>
-                    <td className="text-right font-mono text-amber-400">{s.totalAdj !== 0 ? (s.totalAdj > 0 ? `+${NUM(s.totalAdj)}` : NUM(s.totalAdj)) : "—"}</td>
-                    <td className={`text-right font-black ${isLow ? "text-red-400" : "text-white"}`}>
+                    <td className="text-right font-mono text-green-700">{s.totalIn > 0 ? `+${NUM(s.totalIn)}` : "—"}</td>
+                    <td className="text-right font-mono text-red-700">{s.totalOut > 0 ? `-${NUM(s.totalOut)}` : "—"}</td>
+                    <td className="text-right font-mono text-amber-700">{s.totalAdj !== 0 ? (s.totalAdj > 0 ? `+${NUM(s.totalAdj)}` : NUM(s.totalAdj)) : "—"}</td>
+                    <td className={`text-right font-black ${isLow ? "text-red-700" : "text-gray-900"}`}>
                       {NUM(s.closing)} {isLow && "⚠️"}
                     </td>
                     <td><span className="text-xs text-gray-600">{s.unit}</span></td>
@@ -311,20 +311,20 @@ export default function Movements() {
             <tbody>
               {filteredMoves.map(m => (
                 <tr key={m.id}>
-                  <td className="font-mono text-xs text-blue-400">{m.id}</td>
+                  <td className="font-mono text-xs text-blue-700">{m.id}</td>
                   <td className="text-xs">{DATE(m.date)}</td>
-                  <td className="text-white font-medium">{m.product_name}</td>
+                  <td className="text-gray-900 font-medium">{m.product_name}</td>
                   <td>
                     <span className={`text-xs font-bold ${TYPE_COLOR[m.type]}`}>{TYPE_LABEL[m.type]}</span>
                   </td>
                   <td className="font-mono text-xs text-gray-500">{m.ref}</td>
                   <td className="text-xs text-gray-400 max-w-xs truncate">{m.description}</td>
-                  <td className="text-right font-mono text-green-400">{m.qty_in > 0  ? `+${NUM(m.qty_in)}`  : "—"}</td>
-                  <td className="text-right font-mono text-red-400">{m.qty_out > 0 ? `-${NUM(m.qty_out)}` : "—"}</td>
-                  <td className={`text-right font-mono ${m.qty_adj > 0 ? "text-green-400" : m.qty_adj < 0 ? "text-red-400" : "text-gray-600"}`}>
+                  <td className="text-right font-mono text-green-700">{m.qty_in > 0  ? `+${NUM(m.qty_in)}`  : "—"}</td>
+                  <td className="text-right font-mono text-red-700">{m.qty_out > 0 ? `-${NUM(m.qty_out)}` : "—"}</td>
+                  <td className={`text-right font-mono ${m.qty_adj > 0 ? "text-green-700" : m.qty_adj < 0 ? "text-red-700" : "text-gray-600"}`}>
                     {m.qty_adj !== 0 ? (m.qty_adj > 0 ? `+${m.qty_adj}` : m.qty_adj) : "—"}
                   </td>
-                  <td className="text-right font-black text-white">{NUM(m.balance)}</td>
+                  <td className="text-right font-black text-gray-900">{NUM(m.balance)}</td>
                 </tr>
               ))}
             </tbody>

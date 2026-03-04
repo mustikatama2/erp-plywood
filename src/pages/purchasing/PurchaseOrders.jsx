@@ -67,7 +67,7 @@ export default function PurchaseOrders() {
       <Card>
         <div className="mb-4"><SearchBar value={search} onChange={setSearch} placeholder="Cari nomor PO, vendor…" /></div>
         <Table onRowClick={setSelected} columns={[
-          { key:"po_no",  label:"Nomor PO",   render:v=><span className="font-mono font-bold text-blue-400">{v}</span> },
+          { key:"po_no",  label:"Nomor PO",   render:v=><span className="font-mono font-bold text-blue-700">{v}</span> },
           { key:"vendor", label:"Vendor",     render:v=>v?.name },
           { key:"date",   label:"Tgl. Buat",  render:DATE },
           { key:"delivery_date",label:"Tgl. Kirim",render:DATE },
@@ -82,7 +82,7 @@ export default function PurchaseOrders() {
             <div className="grid grid-cols-2 gap-3 text-sm">
               {[["Vendor",selected.vendor?.name],["Tgl. Dibuat",DATE(selected.date)],
                 ["Tgl. Pengiriman",DATE(selected.delivery_date)],["Status",selected.status]].map(([k,v])=>(
-                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-white">{v}</p></div>
+                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-gray-900">{v}</p></div>
               ))}
             </div>
             <div>
@@ -96,7 +96,7 @@ export default function PurchaseOrders() {
                       <td className="text-right font-bold">{IDR(l.total)}</td></tr>
                   ))}
                 </tbody>
-                <tfoot><tr className="font-black text-white">
+                <tfoot><tr className="font-black text-gray-900">
                   <td colSpan={3} className="text-right px-4 py-2">Total</td>
                   <td className="text-right px-4 py-2">{IDR(selected.total)}</td>
                 </tr></tfoot>
@@ -126,7 +126,7 @@ export default function PurchaseOrders() {
                   <option value="">— Pilih Vendor —</option>
                   {VENDORS.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}
                 </select>
-                {errors.vendor_id && <p className="text-xs text-red-400 mt-1">{errors.vendor_id}</p>}
+                {errors.vendor_id && <p className="text-xs text-red-700 mt-1">{errors.vendor_id}</p>}
               </FormField>
               <FormField label="Tanggal Pengiriman Diharapkan">
                 <input type="date" value={form.delivery_date} onChange={setField("delivery_date")} className="erp-input" />
@@ -136,13 +136,13 @@ export default function PurchaseOrders() {
             {/* Lines */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-bold text-gray-300">Item Pesanan</p>
+                <p className="text-sm font-bold text-gray-700">Item Pesanan</p>
                 <Btn size="xs" variant="secondary" type="button" onClick={addLine}>+ Tambah Baris</Btn>
               </div>
-              {errors.lines && <p className="text-xs text-red-400 mb-2">{errors.lines}</p>}
+              {errors.lines && <p className="text-xs text-red-700 mb-2">{errors.lines}</p>}
               <div className="space-y-2">
                 {form.lines.map((line,i)=>(
-                  <div key={i} className="grid grid-cols-12 gap-2 items-start bg-gray-800/40 rounded-xl p-3">
+                  <div key={i} className="grid grid-cols-12 gap-2 items-start bg-gray-50 rounded-xl p-3">
                     <div className="col-span-4">
                       <p className="erp-label">Nama Barang</p>
                       <input value={line.product} onChange={setLine(i,"product")} className="erp-input" placeholder="Nama produk/bahan" />
@@ -161,19 +161,19 @@ export default function PurchaseOrders() {
                     </div>
                     <div className="col-span-1 pt-5">
                       {form.lines.length>1 && (
-                        <button type="button" onClick={()=>removeLine(i)} className="text-red-400 hover:text-red-300 text-lg">×</button>
+                        <button type="button" onClick={()=>removeLine(i)} className="text-red-700 hover:text-red-300 text-lg">×</button>
                       )}
                     </div>
                     {line.qty&&line.unit_price&&(
                       <div className="col-span-12 text-right text-xs text-gray-400">
-                        Subtotal: <span className="font-bold text-white">{IDR(Number(line.qty)*Number(line.unit_price))}</span>
+                        Subtotal: <span className="font-bold text-gray-900">{IDR(Number(line.qty)*Number(line.unit_price))}</span>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
               {form.lines.some(l=>l.qty&&l.unit_price)&&(
-                <div className="flex justify-end mt-2 text-sm font-black text-white">
+                <div className="flex justify-end mt-2 text-sm font-black text-gray-900">
                   Total: {IDR(form.lines.reduce((s,l)=>s+(Number(l.qty)||0)*(Number(l.unit_price)||0),0))}
                 </div>
               )}
@@ -183,7 +183,7 @@ export default function PurchaseOrders() {
               <textarea value={form.notes} onChange={setField("notes")} className="erp-input h-16 resize-none" placeholder="Catatan tambahan…" />
             </FormField>
 
-            <div className="flex justify-end gap-2 border-t border-gray-800 pt-4">
+            <div className="flex justify-end gap-2 border-t border-gray-200 pt-4">
               <Btn variant="secondary" type="button" onClick={()=>setShowForm(false)}>Batal</Btn>
               <Btn type="submit">✅ Buat Purchase Order</Btn>
             </div>

@@ -94,11 +94,11 @@ function NewAssetModal({ onClose, onSave, existingAssets }) {
           <div>
             <label className="erp-label">Kode Aset</label>
             <input value={genAssetCode(existingAssets)} readOnly
-              className="erp-input bg-gray-800/50 text-gray-400 cursor-not-allowed" />
+              className="erp-input bg-gray-100 text-gray-500 cursor-not-allowed" />
             <p className="text-xs text-gray-600 mt-0.5">Dibuat otomatis</p>
           </div>
           <div>
-            <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Kategori</label>
+            <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Kategori</label>
             <select value={form.category} onChange={set("category")} className="erp-input">
               {CATEGORIES.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}
             </select>
@@ -106,18 +106,18 @@ function NewAssetModal({ onClose, onSave, existingAssets }) {
         </div>
 
         <div>
-          <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Nama Aset</label>
+          <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Nama Aset</label>
           <input value={form.name} onChange={set("name")} className="erp-input"
             placeholder="Misal: Hot Press Machine 2000T" />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Tanggal Perolehan</label>
+            <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Tanggal Perolehan</label>
             <input type="date" value={form.purchase_date} onChange={set("purchase_date")} className="erp-input" />
           </div>
           <div>
-            <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Biaya Perolehan (IDR)</label>
+            <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Biaya Perolehan (IDR)</label>
             <input type="number" value={form.cost} onChange={set("cost")} className="erp-input" placeholder="1200000000" />
             {cost > 0 && <p className="text-xs text-gray-500 mt-0.5">{IDR(cost)}</p>}
           </div>
@@ -125,7 +125,7 @@ function NewAssetModal({ onClose, onSave, existingAssets }) {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="erp-label after:content-['*'] after:text-red-400 after:ml-0.5">Masa Manfaat (Tahun)</label>
+            <label className="erp-label after:content-['*'] after:text-red-700 after:ml-0.5">Masa Manfaat (Tahun)</label>
             <input type="number" min="1" max="40" value={form.life_years} onChange={set("life_years")} className="erp-input" />
           </div>
           <div>
@@ -149,16 +149,16 @@ function NewAssetModal({ onClose, onSave, existingAssets }) {
 
         {/* Depreciation preview */}
         {cost > 0 && life_years > 0 && (
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 space-y-2">
-            <p className="text-xs font-bold text-amber-400 uppercase tracking-wide">📊 Estimasi Depresiasi Garis Lurus</p>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
+            <p className="text-xs font-bold text-amber-700 uppercase tracking-wide">📊 Estimasi Depresiasi Garis Lurus</p>
             <div className="grid grid-cols-3 gap-3 text-sm">
               <div>
                 <p className="text-xs text-gray-500">Per Bulan</p>
-                <p className="font-bold text-amber-300">{IDR(monthly)}</p>
+                <p className="font-bold text-amber-700">{IDR(monthly)}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Per Tahun</p>
-                <p className="font-bold text-white">{IDR(monthly * 12)}</p>
+                <p className="font-bold text-gray-900">{IDR(monthly * 12)}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Nilai Akhir</p>
@@ -171,7 +171,7 @@ function NewAssetModal({ onClose, onSave, existingAssets }) {
           </div>
         )}
 
-        <div className="flex justify-end gap-2 pt-2 border-t border-gray-800">
+        <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
           <Btn variant="secondary" onClick={onClose}>Batal</Btn>
           <Btn onClick={handleSave} disabled={saving}>
             {saving ? "Menyimpan…" : "💾 Simpan Aset"}
@@ -206,24 +206,24 @@ function AssetDetailModal({ asset, onClose, onRetire }) {
           ].map(([k, v]) => (
             <div key={k}>
               <p className="text-xs text-gray-500">{k}</p>
-              <p className="font-semibold text-white mt-0.5">{v}</p>
+              <p className="font-semibold text-gray-900 mt-0.5">{v}</p>
             </div>
           ))}
         </div>
 
         {/* Current depreciation summary */}
-        <div className="bg-gray-800/50 rounded-xl p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div className="bg-gray-100 rounded-xl p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <p className="text-xs text-gray-500">Depresiasi / Bulan</p>
-            <p className="font-bold text-amber-400 text-base">{IDR(dep.monthly)}</p>
+            <p className="font-bold text-amber-700 text-base">{IDR(dep.monthly)}</p>
           </div>
           <div>
             <p className="text-xs text-gray-500">Total Akumulasi</p>
-            <p className="font-bold text-amber-300 text-base">{IDR(dep.accum)}</p>
+            <p className="font-bold text-amber-700 text-base">{IDR(dep.accum)}</p>
           </div>
           <div>
             <p className="text-xs text-gray-500">Nilai Buku Saat Ini</p>
-            <p className="font-bold text-blue-400 text-base">{IDR(dep.bookValue)}</p>
+            <p className="font-bold text-blue-700 text-base">{IDR(dep.bookValue)}</p>
           </div>
           <div>
             <p className="text-xs text-gray-500">Sisa Masa Manfaat</p>
@@ -237,7 +237,7 @@ function AssetDetailModal({ asset, onClose, onRetire }) {
             <span>Progres Depresiasi: {PCT(dep.pctDepreciated)}</span>
             <span>{dep.monthsElapsed} bln / {asset.life_years * 12} bln</span>
           </div>
-          <div className="w-full bg-gray-800 rounded-full h-3">
+          <div className="w-full bg-gray-100 rounded-full h-3">
             <div
               className="h-3 rounded-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all"
               style={{ width: `${Math.min(dep.pctDepreciated, 100)}%` }}
@@ -249,7 +249,7 @@ function AssetDetailModal({ asset, onClose, onRetire }) {
         <div>
           <button
             onClick={() => setShowSched(s => !s)}
-            className="text-sm text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1"
+            className="text-sm text-blue-700 hover:text-blue-300 font-medium flex items-center gap-1"
           >
             {showSched ? "▾" : "▸"} Jadwal Depresiasi Tahunan
           </button>
@@ -272,11 +272,11 @@ function AssetDetailModal({ asset, onClose, onRetire }) {
                       <tr key={row.year} className={isCurrentYear ? "bg-amber-500/10" : ""}>
                         <td>
                           Tahun {row.year}
-                          {isCurrentYear && <span className="ml-1 text-xs text-amber-400">← Saat ini</span>}
+                          {isCurrentYear && <span className="ml-1 text-xs text-amber-700">← Saat ini</span>}
                         </td>
-                        <td className="text-right font-mono text-amber-300">{IDR(row.annual_dep)}</td>
-                        <td className="text-right font-mono text-amber-400">{IDR(row.accum_dep)}</td>
-                        <td className="text-right font-mono font-bold text-blue-400">{IDR(row.book_value)}</td>
+                        <td className="text-right font-mono text-amber-700">{IDR(row.annual_dep)}</td>
+                        <td className="text-right font-mono text-amber-700">{IDR(row.accum_dep)}</td>
+                        <td className="text-right font-mono font-bold text-blue-700">{IDR(row.book_value)}</td>
                       </tr>
                     );
                   })}
@@ -287,7 +287,7 @@ function AssetDetailModal({ asset, onClose, onRetire }) {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-between items-center pt-2 border-t border-gray-800">
+        <div className="flex justify-between items-center pt-2 border-t border-gray-200">
           <div className="flex gap-2">
             {asset.status !== "Retired" && (
               <Btn variant="danger" onClick={() => {
@@ -383,7 +383,7 @@ export default function Assets() {
           label="Total Biaya Perolehan"
           value={IDR(totalCost)}
           icon="💰"
-          color="text-amber-400"
+          color="text-amber-700"
         />
         <KPICard
           label="Nilai Buku (Net)"
@@ -396,7 +396,7 @@ export default function Assets() {
           label="Beban Depresiasi / Bulan"
           value={IDR(monthlyCharge)}
           icon="🗓️"
-          color="text-blue-400"
+          color="text-blue-700"
           sub="Garis lurus"
         />
       </div>
@@ -411,7 +411,7 @@ export default function Assets() {
                 className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${
                   catFilter === c
                     ? "bg-blue-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                 }`}>
                 {c === "All" ? "Semua" : c}{" "}
                 <span className="ml-1 opacity-70">
@@ -429,14 +429,14 @@ export default function Assets() {
             {
               key: "asset_no",
               label: "Kode Aset",
-              render: v => <span className="font-mono text-xs text-blue-400 font-bold">{v}</span>,
+              render: v => <span className="font-mono text-xs text-blue-700 font-bold">{v}</span>,
             },
             { key: "name", label: "Nama Aset" },
             {
               key: "category",
               label: "Kategori",
               render: v => (
-                <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-300">{v}</span>
+                <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700">{v}</span>
               ),
             },
             {
@@ -454,7 +454,7 @@ export default function Assets() {
               key: "_dep",
               label: "Akum. Depresiasi",
               right: true,
-              render: dep => <span className="font-mono text-amber-400">{IDR(dep.accum)}</span>,
+              render: dep => <span className="font-mono text-amber-700">{IDR(dep.accum)}</span>,
             },
             {
               key: "_dep",
@@ -466,7 +466,7 @@ export default function Assets() {
               key: "life_years",
               label: "Masa (Thn)",
               right: true,
-              render: v => <span className="text-gray-300">{v}</span>,
+              render: v => <span className="text-gray-700">{v}</span>,
             },
             {
               key: "status",

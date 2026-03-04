@@ -26,7 +26,7 @@ export default function Employees() {
         {depts.map(d=>(
           <div key={d} className="erp-card px-3 py-2 text-sm">
             <span className="text-gray-400">{d}</span>
-            <span className="ml-2 font-black text-white">{EMPLOYEES.filter(e=>e.dept===d).length}</span>
+            <span className="ml-2 font-black text-gray-900">{EMPLOYEES.filter(e=>e.dept===d).length}</span>
           </div>
         ))}
       </div>
@@ -50,7 +50,7 @@ export default function Employees() {
             <div className="grid grid-cols-2 gap-3 text-sm">
               {[["Emp No",selected.emp_no],["Department",selected.dept],["Position",selected.position],
                 ["Hire Date",DATE(selected.hire_date)],["Salary",IDR(selected.salary)],["Status",selected.status]].map(([k,v])=>(
-                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-white">{v}</p></div>
+                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-gray-900">{v}</p></div>
               ))}
             </div>
             <div className="flex justify-end gap-2">

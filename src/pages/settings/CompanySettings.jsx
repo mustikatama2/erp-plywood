@@ -42,7 +42,7 @@ export default function CompanySettings() {
             </div>
             <div className="flex items-center gap-3">
               <input type="checkbox" id="auto-je" defaultChecked className="w-4 h-4 accent-blue-600" />
-              <label htmlFor="auto-je" className="text-sm text-gray-300">Auto-create journal entries on invoice posting</label>
+              <label htmlFor="auto-je" className="text-sm text-gray-700">Auto-create journal entries on invoice posting</label>
             </div>
             <div className="flex justify-end">
               <Btn>Save Preferences</Btn>

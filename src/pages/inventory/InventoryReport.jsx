@@ -66,10 +66,10 @@ function generateStockCard(productId, month) {
 }
 
 const TYPE_STYLE = {
-  OPENING: { label: "Saldo Awal", color: "text-blue-400",  bg: "bg-blue-500/10" },
-  IN:      { label: "Masuk",      color: "text-green-400", bg: "bg-green-500/10" },
-  OUT:     { label: "Keluar",     color: "text-red-400",   bg: "bg-red-500/10" },
-  ADJ:     { label: "Penyesuaian",color: "text-amber-400", bg: "bg-amber-500/10" },
+  OPENING: { label: "Saldo Awal", color: "text-blue-700",  bg: "bg-blue-500/10" },
+  IN:      { label: "Masuk",      color: "text-green-700", bg: "bg-green-500/10" },
+  OUT:     { label: "Keluar",     color: "text-red-700",   bg: "bg-red-500/10" },
+  ADJ:     { label: "Penyesuaian",color: "text-amber-700", bg: "bg-amber-500/10" },
 };
 
 // ── SKU Summary row ───────────────────────────────────────────────────────────
@@ -162,7 +162,7 @@ export default function InventoryReport() {
         <div className="flex gap-1 flex-wrap">
           {cats.map(c => (
             <button key={c} onClick={() => setCat(c)}
-              className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${catFilter===c?"bg-blue-600 text-white":"bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+              className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${catFilter===c?"bg-blue-600 text-white":"bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
               {c}
             </button>
           ))}
@@ -172,9 +172,9 @@ export default function InventoryReport() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         <KPICard label="Total SKU"       sublabel="Products tracked" value={summaries.length}               icon="🗂️" />
-        <KPICard label="Total Masuk"     sublabel="Receipts this month"  value={`+${NUM(totalIn)}`}  color="text-green-400" icon="📦" />
-        <KPICard label="Total Keluar"    sublabel="Issues this month"    value={`-${NUM(totalOut)}`} color="text-red-400"   icon="📤" />
-        <KPICard label="Stok Rendah"     sublabel="Below reorder point"  value={lowStock}            color={lowStock>0?"text-red-400":"text-green-400"} icon="⚠️" />
+        <KPICard label="Total Masuk"     sublabel="Receipts this month"  value={`+${NUM(totalIn)}`}  color="text-green-700" icon="📦" />
+        <KPICard label="Total Keluar"    sublabel="Issues this month"    value={`-${NUM(totalOut)}`} color="text-red-700"   icon="📤" />
+        <KPICard label="Stok Rendah"     sublabel="Below reorder point"  value={lowStock}            color={lowStock>0?"text-red-700":"text-green-700"} icon="⚠️" />
       </div>
 
       <div className={`grid gap-4 ${selected ? "md:grid-cols-[1fr_1.5fr]" : "grid-cols-1"}`}>
@@ -203,16 +203,16 @@ export default function InventoryReport() {
                     style={isSelected ? { background: 'rgba(240,194,0,0.08)' } : {}}>
                     <td>
                       <div>
-                        <p className={`font-semibold text-sm ${isSelected ? "text-yellow-400" : "text-white"}`}>{s.name}</p>
+                        <p className={`font-semibold text-sm ${isSelected ? "text-yellow-400" : "text-gray-900"}`}>{s.name}</p>
                         <p className="text-xs text-gray-600">{s.category}</p>
                       </div>
                     </td>
                     <td className="text-right font-mono text-gray-400 text-xs">{NUM(s.opening)}</td>
-                    <td className="text-right font-mono text-green-400 text-xs">{s.totalIn > 0 ? `+${NUM(s.totalIn)}` : "—"}</td>
-                    <td className="text-right font-mono text-red-400 text-xs">{s.totalOut > 0 ? `-${NUM(s.totalOut)}` : "—"}</td>
-                    <td className="text-right font-mono text-amber-400 text-xs">{s.totalAdj !== 0 ? (s.totalAdj > 0 ? `+${s.totalAdj}` : s.totalAdj) : "—"}</td>
+                    <td className="text-right font-mono text-green-700 text-xs">{s.totalIn > 0 ? `+${NUM(s.totalIn)}` : "—"}</td>
+                    <td className="text-right font-mono text-red-700 text-xs">{s.totalOut > 0 ? `-${NUM(s.totalOut)}` : "—"}</td>
+                    <td className="text-right font-mono text-amber-700 text-xs">{s.totalAdj !== 0 ? (s.totalAdj > 0 ? `+${s.totalAdj}` : s.totalAdj) : "—"}</td>
                     <td className="text-right">
-                      <span className={`font-black text-sm ${isLow ? "text-red-400" : "text-white"}`}>
+                      <span className={`font-black text-sm ${isLow ? "text-red-700" : "text-gray-900"}`}>
                         {NUM(s.closing)}{isLow ? " ⚠️" : ""}
                       </span>
                     </td>
@@ -230,13 +230,13 @@ export default function InventoryReport() {
             title={`Kartu Stok: ${selected.name}`}
             subtitle={MONTHS.find(m=>m.value===month)?.label}
             action={
-              <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-gray-300 text-lg">✕</button>
+              <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-gray-700 text-lg">✕</button>
             }
           >
             {/* Summary strip */}
             <div className="grid grid-cols-4 gap-2 mb-3">
-              {[["Awal",selected.opening,"text-gray-400"],["Masuk",selected.totalIn,"text-green-400"],
-                ["Keluar",selected.totalOut,"text-red-400"],["Akhir",selected.closing,"text-white"]].map(([l,v,c])=>(
+              {[["Awal",selected.opening,"text-gray-400"],["Masuk",selected.totalIn,"text-green-700"],
+                ["Keluar",selected.totalOut,"text-red-700"],["Akhir",selected.closing,"text-gray-900"]].map(([l,v,c])=>(
                 <div key={l} className="text-center p-2 rounded-lg" style={{background:'var(--bg-input)'}}>
                   <p className="text-xs text-gray-500">{l}</p>
                   <p className={`font-black text-sm ${c}`}>{NUM(v)}</p>
@@ -258,12 +258,12 @@ export default function InventoryReport() {
                         <td className="text-gray-500">{e.date.slice(5)}</td>
                         <td><span className={`font-bold ${ts.color}`}>{ts.label}</span></td>
                         <td className="font-mono text-gray-500">{e.ref}</td>
-                        <td className="text-right text-green-400">{e.qty_in  > 0 ? `+${NUM(e.qty_in)}`   : "—"}</td>
-                        <td className="text-right text-red-400">{e.qty_out > 0 ? `-${NUM(e.qty_out)}` : "—"}</td>
-                        <td className={`text-right ${(e.qty_adj||0)>0?"text-green-400":(e.qty_adj||0)<0?"text-red-400":"text-gray-600"}`}>
+                        <td className="text-right text-green-700">{e.qty_in  > 0 ? `+${NUM(e.qty_in)}`   : "—"}</td>
+                        <td className="text-right text-red-700">{e.qty_out > 0 ? `-${NUM(e.qty_out)}` : "—"}</td>
+                        <td className={`text-right ${(e.qty_adj||0)>0?"text-green-700":(e.qty_adj||0)<0?"text-red-700":"text-gray-600"}`}>
                           {(e.qty_adj||0) !== 0 ? ((e.qty_adj>0)?`+${e.qty_adj}`:e.qty_adj) : "—"}
                         </td>
-                        <td className="text-right font-black text-white">{NUM(e.balance)}</td>
+                        <td className="text-right font-black text-gray-900">{NUM(e.balance)}</td>
                       </tr>
                     );
                   })}

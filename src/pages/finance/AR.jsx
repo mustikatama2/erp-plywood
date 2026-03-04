@@ -31,8 +31,8 @@ export default function AR() {
         actions={<><Btn variant="secondary" onClick={()=>exportCSV(enriched.map(i=>({...i,customer:i.customer?.name})),"ar.csv")}>📤 Export</Btn><Btn>+ New Invoice</Btn></>} />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <KPICard label="Total Piutang" sublabel="AR Outstanding" value={IDR(total)} color="text-amber-300" icon="📤" />
-        <KPICard label="Sudah Jatuh Tempo" sublabel="Overdue" value={IDR(overdue)} color="text-red-400" icon="🔴" sub={`${enriched.filter(i=>i.status==="Overdue").length} invoice`} />
+        <KPICard label="Total Piutang" sublabel="AR Outstanding" value={IDR(total)} color="text-amber-700" icon="📤" />
+        <KPICard label="Sudah Jatuh Tempo" sublabel="Overdue" value={IDR(overdue)} color="text-red-700" icon="🔴" sub={`${enriched.filter(i=>i.status==="Overdue").length} invoice`} />
         <KPICard label="Invoice Terbuka" sublabel="Open Invoices" value={enriched.filter(i=>i.status!=="Paid").length} icon="📄" />
         <KPICard label="Jumlah Customer" sublabel="with balance" value={new Set(enriched.filter(i=>i.balance>0).map(i=>i.customer_id)).size} icon="👥" />
       </div>
@@ -43,7 +43,7 @@ export default function AR() {
           <div className="flex gap-1.5 flex-wrap">
             {STATUSES.map(s=>(
               <button key={s} onClick={()=>setFilter(s)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${filter===s?"bg-blue-600 text-white":"bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${filter===s?"bg-blue-600 text-white":"bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
                 {s}
                 <span className="ml-1.5 text-xs opacity-70">{s==="All"?enriched.length:enriched.filter(i=>i.status===s).length}</span>
               </button>
@@ -51,16 +51,16 @@ export default function AR() {
           </div>
         </div>
         <Table onRowClick={setSelected} columns={[
-          { key:"inv_no",    label:"Invoice No",  render:v=><span className="font-mono font-bold text-blue-400">{v}</span> },
+          { key:"inv_no",    label:"Invoice No",  render:v=><span className="font-mono font-bold text-blue-700">{v}</span> },
           { key:"customer",  label:"Customer",    render:v=>v?.name.split(" ").slice(0,3).join(" ") },
           { key:"date",      label:"Date",        render:DATE },
           { key:"due_date",  label:"Due Date",    render:(v,r)=>{
             const overdue = new Date(v) < new Date() && r.status!=="Paid";
-            return <span className={overdue?"text-red-400 font-bold":"text-gray-300"}>{DATE(v)}{overdue?" ⚠️":""}</span>;
+            return <span className={overdue?"text-red-700 font-bold":"text-gray-700"}>{DATE(v)}{overdue?" ⚠️":""}</span>;
           }},
           { key:"currency",  label:"Ccy"          },
           { key:"total",     label:"Invoice Total",right:true, render:(v,r)=><span className="font-mono">{r.currency} {v.toLocaleString()}</span> },
-          { key:"balance",   label:"Balance",      right:true, render:(v,r)=><span className={v>0?"font-black text-amber-300":"text-gray-500"}>{r.currency} {v.toLocaleString()}</span> },
+          { key:"balance",   label:"Balance",      right:true, render:(v,r)=><span className={v>0?"font-black text-amber-700":"text-gray-500"}>{r.currency} {v.toLocaleString()}</span> },
           { key:"status",    label:"Status",       render:v=><Badge status={v} /> },
         ]} data={filtered} />
       </Card>
@@ -73,12 +73,12 @@ export default function AR() {
                 ["Due Date",DATE(selected.due_date)],["Currency",selected.currency],
                 ["Invoice Total",`${selected.currency} ${selected.total.toLocaleString()}`],
                 ["Amount Paid",`${selected.currency} ${selected.paid.toLocaleString()}`]].map(([k,v])=>(
-                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-white">{v}</p></div>
+                <div key={k}><p className="text-xs text-gray-500">{k}</p><p className="font-medium text-gray-900">{v}</p></div>
               ))}
             </div>
             <div className="erp-card p-4 flex justify-between items-center">
               <span>Balance Outstanding</span>
-              <span className={`text-2xl font-black ${selected.balance>0?"text-amber-300":"text-green-400"}`}>
+              <span className={`text-2xl font-black ${selected.balance>0?"text-amber-700":"text-green-700"}`}>
                 {selected.currency} {selected.balance.toLocaleString()}
               </span>
             </div>

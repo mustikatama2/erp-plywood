@@ -2,25 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Brand CSS Variables ──────────────────────────────────────────────── */
+/* ── Brand CSS Variables — Warm Light Mode ───────────────────────────────── */
 :root {
-  --gold:          #F0C200;
-  --gold-dark:     #C4A300;
-  --forest:        #1B6830;
-  --brand-dark:    #1A1C14;
-  --bg-base:       #10130A;
-  --bg-sidebar:    #14170D;
-  --bg-card:       #191E10;
-  --bg-card-hover: #1E2414;
-  --bg-input:      #1F2417;
-  --border:        #2A3020;
-  --border-light:  #353F25;
-  --text-primary:  #EBF0E2;
-  --text-secondary:#8A9478;
-  --text-muted:    #5C6A50;
+  /* Brand accents */
+  --gold:            #F0C200;
+  --gold-dark:       #C4A300;
+  --forest:          #1B6830;
+  --brand-dark:      #1A1C14;
+
+  /* Content area — warm cream / light */
+  --bg-base:         #F0EDE5;   /* warm cream — main page background */
+  --bg-sidebar:      #1A1C14;   /* dark olive — sidebar stays dark */
+  --bg-topbar:       #1A1C14;   /* dark topbar matching sidebar */
+  --bg-card:         #FFFFFF;   /* white cards */
+  --bg-card-hover:   #FAF8F4;   /* card hover tint */
+  --bg-input:        #FDFCF8;   /* input field background */
+
+  /* Borders */
+  --border:          #DDD8CC;   /* warm gray border */
+  --border-light:    #EDE8DE;   /* subtle divider */
+
+  /* Text — dark olive on light background */
+  --text-primary:    #1E2414;   /* main readable text */
+  --text-secondary:  #424F38;   /* secondary text */
+  --text-muted:      #7A8870;   /* muted/labels */
 }
 
-/* ── Base ─────────────────────────────────────────────────────────────── */
+/* ── Base ─────────────────────────────────────────────────────────────────── */
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);
@@ -30,147 +38,168 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Scrollbar ───────────────────────────────────────────────────────── */
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--bg-sidebar); }
-::-webkit-scrollbar-thumb { background: #2E3820; border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
 
-/* ── Animations ─────────────────────────────────────────────────────── */
+/* ── Animations ──────────────────────────────────────────────────────────── */
 @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes slideUp      { from { transform: translateY(6px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes fadeIn       { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp      { from { transform: translateY(6px);  opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeIn       { from { opacity: 0; }                               to { opacity: 1; } }
 .animate-in.slide-in-from-right-2 { animation: slideInRight 0.25s ease-out; }
-.animate-slide-up { animation: slideUp 0.2s ease-out; }
-.animate-fade-in  { animation: fadeIn  0.2s ease-out; }
+.animate-slide-up { animation: slideUp  0.2s ease-out; }
+.animate-fade-in  { animation: fadeIn   0.2s ease-out; }
 
-/* ── Table ──────────────────────────────────────────────────────────── */
+/* ── Table ────────────────────────────────────────────────────────────────── */
 .erp-table { @apply w-full text-sm; }
-.erp-table thead tr { border-bottom: 1px solid var(--border); }
+.erp-table thead tr { border-bottom: 1px solid var(--border); background-color: #FAF8F3; }
 .erp-table thead th {
   @apply text-left px-4 py-2.5 text-xs font-bold uppercase tracking-wider;
   color: var(--text-muted);
 }
 .erp-table tbody tr {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-light);
   transition: background-color 0.12s;
+  background-color: var(--bg-card);
 }
 .erp-table tbody tr:hover { background-color: var(--bg-card-hover); }
 .erp-table tbody td { @apply px-4 py-3; color: var(--text-secondary); }
 
-/* ── Form controls ──────────────────────────────────────────────────── */
-.erp-input {
-  width: 100%;
-  background: var(--bg-input);
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+.erp-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 3px 0 rgba(26,28,20,0.07), 0 1px 2px -1px rgba(26,28,20,0.05);
   color: var(--text-primary);
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  outline: none;
+}
+.erp-card:hover {
+  box-shadow: 0 4px 14px 0 rgba(26,28,20,0.09), 0 2px 4px -1px rgba(26,28,20,0.06);
+  transition: box-shadow 0.18s;
+}
+
+/* ── Input ────────────────────────────────────────────────────────────────── */
+.erp-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  width: 100%;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .erp-input:focus {
+  outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(240, 194, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(240,194,0,0.15);
 }
 .erp-input::placeholder { color: var(--text-muted); }
+.erp-input:disabled { opacity: 0.5; cursor: not-allowed; background-color: #F5F1E9; }
 
-.erp-select {
-  width: 100%;
-  background: var(--bg-input);
-  color: var(--text-primary);
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  outline: none;
-  cursor: pointer;
+/* Select arrow */
+select.erp-input {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235C6A50' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237A8870' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 32px;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
 }
-.erp-select:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(240, 194, 0, 0.15); }
 
+/* ── Label ────────────────────────────────────────────────────────────────── */
 .erp-label {
   display: block;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 0.375rem;
   color: var(--text-muted);
-  margin-bottom: 5px;
 }
 
-/* ── Card ───────────────────────────────────────────────────────────── */
-.erp-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-
-/* Category accent bars on cards — visual section differentiation */
-.erp-card-sales    { border-left: 3px solid #3B82F6; }
-.erp-card-finance  { border-left: 3px solid #F59E0B; }
-.erp-card-inventory{ border-left: 3px solid #14B8A6; }
-.erp-card-hr       { border-left: 3px solid #A855F7; }
-.erp-card-ops      { border-left: 3px solid var(--gold); }
-
-/* ── KPI cards — subtle gradient backgrounds by type ───────────────── */
-.kpi-revenue  { background: linear-gradient(135deg, #1A1F10 0%, #1F2D12 100%); border-color: #2D4018; }
-.kpi-expense  { background: linear-gradient(135deg, #1A160A 0%, #2A1F08 100%); border-color: #3D2E0A; }
-.kpi-cash     { background: linear-gradient(135deg, #0F1A18 0%, #122522 100%); border-color: #1A3830; }
-.kpi-alert    { background: linear-gradient(135deg, #1A100A 0%, #2A1510 100%); border-color: #3D2015; }
-
-/* ── Sidebar brand treatment ─────────────────────────────────────────── */
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
 .sidebar-brand {
-  background: var(--bg-sidebar);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill-opacity='0.025' fill='%23F0C200'%3E%3Cpath d='M0 35 Q30 32 60 38 Q90 44 120 35 L120 40 Q90 49 60 43 Q30 37 0 40Z'/%3E%3Cpath d='M0 65 Q35 61 70 68 Q95 73 120 65 L120 70 Q95 78 70 73 Q35 66 0 70Z'/%3E%3Cpath d='M0 92 Q25 89 60 95 Q90 99 120 92 L120 97 Q90 104 60 100 Q25 94 0 97Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-color: var(--bg-sidebar);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.03'%3E%3Cpath d='M0 30 Q25 28 50 32 Q75 36 100 30 L100 34 Q75 40 50 36 Q25 32 0 34Z' fill='%23F0C200'/%3E%3Cpath d='M0 55 Q30 52 60 58 Q80 62 100 55 L100 59 Q80 66 60 62 Q30 56 0 59Z' fill='%23F0C200'/%3E%3Cpath d='M0 78 Q20 75 50 80 Q75 84 100 78 L100 82 Q75 88 50 84 Q20 79 0 82Z' fill='%23F0C200'/%3E%3C/g%3E%3C/svg%3E");
 }
 
+/* ── Nav active item — gold on dark sidebar ───────────────────────────────── */
 .nav-item-active {
-  background: var(--gold) !important;
-  color: #1A1C14 !important;
-  font-weight: 700;
+  background: rgba(240, 194, 0, 0.14) !important;
+  color: var(--gold) !important;
+  border: 1px solid rgba(240, 194, 0, 0.22);
 }
-.nav-item-active svg, .nav-item-active span { color: #1A1C14 !important; }
+.nav-item-active span,
+.nav-item-active p { color: var(--gold) !important; }
 
-/* ── Button overrides ────────────────────────────────────────────────── */
-.btn-primary {
-  background: linear-gradient(135deg, #4A7A2F 0%, #2E5C1A 100%);
-  border: 1px solid #3A6024;
-  color: #EBF0E2;
-}
-.btn-primary:hover { background: linear-gradient(135deg, #558A35 0%, #366820 100%); }
-
-/* ── Status badges ───────────────────────────────────────────────────── */
-.badge-active   { @apply bg-green-900/50 text-green-400 border border-green-700/40; }
-.badge-pending  { @apply bg-amber-900/40 text-amber-300 border border-amber-700/30; }
-.badge-overdue  { @apply bg-red-900/40   text-red-400   border border-red-700/30;   }
-.badge-inactive { @apply bg-gray-800/60  text-gray-500  border border-gray-700/30;  }
-
-/* ── Section dividers ────────────────────────────────────────────────── */
+/* ── Section titles (sidebar nav groups) ─────────────────────────────────── */
 .section-title {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+  font-weight: 800;
   text-transform: uppercase;
-  color: var(--gold);
-  opacity: 0.7;
-  padding: 0 8px;
-  margin-bottom: 6px;
+  letter-spacing: 0.12em;
+  color: rgba(240, 194, 0, 0.45);
 }
 
-/* ── Progress bars ───────────────────────────────────────────────────── */
-.progress-track { background: var(--border); border-radius: 999px; overflow: hidden; }
-.progress-fill  { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
-.progress-gold  { background: linear-gradient(90deg, var(--gold-dark), var(--gold)); }
-.progress-green { background: linear-gradient(90deg, var(--forest), #2EA84A); }
-.progress-blue  { background: linear-gradient(90deg, #2563EB, #60A5FA); }
+/* ── KPI cards — gradient accent line on top ──────────────────────────────── */
+.kpi-gold    { border-top: 3px solid var(--gold); }
+.kpi-green   { border-top: 3px solid #1B6830; }
+.kpi-blue    { border-top: 3px solid #2563eb; }
+.kpi-red     { border-top: 3px solid #dc2626; }
+.kpi-purple  { border-top: 3px solid #7c3aed; }
+.kpi-amber   { border-top: 3px solid #d97706; }
 
-/* ── Recharts custom ─────────────────────────────────────────────────── */
-.recharts-cartesian-grid-horizontal line,
-.recharts-cartesian-grid-vertical line { stroke: var(--border) !important; }
-.recharts-text { fill: var(--text-muted) !important; }
+/* ── Section header ───────────────────────────────────────────────────────── */
+.page-section-title {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Progress bar ─────────────────────────────────────────────────────────── */
+.progress-bar { background-color: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 99px; background: var(--gold); transition: width 0.4s ease; }
+
+/* ── Recharts tooltip override ────────────────────────────────────────────── */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(26,28,20,0.12) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ── Alert banners ────────────────────────────────────────────────────────── */
+.alert-warning {
+  background: #FEF9E7;
+  border: 1px solid #F0C200;
+  border-left: 4px solid #F0C200;
+  border-radius: 0.75rem;
+  color: #7A5F00;
+}
+.alert-danger {
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  border-left: 4px solid #DC2626;
+  border-radius: 0.75rem;
+  color: #7F1D1D;
+}
+.alert-success {
+  background: #F0FDF4;
+  border: 1px solid #86EFAC;
+  border-left: 4px solid #16A34A;
+  border-radius: 0.75rem;
+  color: #14532D;
+}
+.alert-info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-left: 4px solid #2563EB;
+  border-radius: 0.75rem;
+  color: #1E3A8A;
+}

@@ -168,7 +168,7 @@ function VarAmount({ amount, reverse = false }) {
   // Unfavorable = positive (spent more than standard)
   const isFav = reverse ? amount > 0 : amount < 0;
   return (
-    <span className={`font-mono font-bold text-xs ${isFav ? "text-green-400" : "text-red-400"}`}>
+    <span className={`font-mono font-bold text-xs ${isFav ? "text-green-700" : "text-red-700"}`}>
       {amount >= 0 ? "+" : ""}{IDR(amount)}
       <span className="ml-1 font-normal">{isFav ? "F" : "U"}</span>
     </span>
@@ -187,9 +187,9 @@ function BatchVarianceDetail({ result, onClose }) {
 
         {/* Summary */}
         <div className="grid grid-cols-3 gap-3 text-center">
-          {[["Biaya Standar", totals.std, "text-blue-400"],
-            ["Biaya Aktual",  totals.actual, "text-white"],
-            ["Total Varians", totals.var, totals.var>0?"text-red-400":"text-green-400"]
+          {[["Biaya Standar", totals.std, "text-blue-700"],
+            ["Biaya Aktual",  totals.actual, "text-gray-900"],
+            ["Total Varians", totals.var, totals.var>0?"text-red-700":"text-green-700"]
           ].map(([l, v, c]) => (
             <div key={l} className="erp-card p-3">
               <p className="text-xs text-gray-500 mb-1">{l}</p>
@@ -200,9 +200,9 @@ function BatchVarianceDetail({ result, onClose }) {
 
         {/* DM Section */}
         <div>
-          <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+          <h4 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
             🪵 Direct Materials (Aktual)
-            <span className={`text-xs font-normal ${dm.totalVar>0?"text-red-400":"text-green-400"}`}>
+            <span className={`text-xs font-normal ${dm.totalVar>0?"text-red-700":"text-green-700"}`}>
               Varians: <VarAmount amount={-dm.totalVar} />
             </span>
           </h4>
@@ -211,8 +211,8 @@ function BatchVarianceDetail({ result, onClose }) {
             <tbody>
               {dm.items.map(item => (
                 <tr key={item.material}>
-                  <td className="text-white">{item.material}</td>
-                  <td className="text-right font-mono text-blue-400">{IDR(item.stdCost)}</td>
+                  <td className="text-gray-900">{item.material}</td>
+                  <td className="text-right font-mono text-blue-700">{IDR(item.stdCost)}</td>
                   <td className="text-right font-mono">{IDR(item.actCost)}</td>
                   <td className="text-right"><VarAmount amount={-item.priceVar} /></td>
                   <td className="text-right"><VarAmount amount={-item.qtyVar} /></td>
@@ -221,8 +221,8 @@ function BatchVarianceDetail({ result, onClose }) {
               ))}
               <tr className="font-black">
                 <td>Total DM</td>
-                <td className="text-right font-mono text-blue-400">{IDR(dm.totalStd)}</td>
-                <td className="text-right font-mono text-white">{IDR(dm.totalActual)}</td>
+                <td className="text-right font-mono text-blue-700">{IDR(dm.totalStd)}</td>
+                <td className="text-right font-mono text-gray-900">{IDR(dm.totalActual)}</td>
                 <td /><td />
                 <td className="text-right"><VarAmount amount={-dm.totalVar} /></td>
               </tr>
@@ -232,7 +232,7 @@ function BatchVarianceDetail({ result, onClose }) {
 
         {/* DL Section */}
         <div>
-          <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+          <h4 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
             👷 Direct Labor (Standar Rate)
             <span className="text-xs font-normal text-gray-500">Rate: standar · Hours: aktual</span>
           </h4>
@@ -241,7 +241,7 @@ function BatchVarianceDetail({ result, onClose }) {
             <tbody>
               {dl.items.map(item => (
                 <tr key={item.dept}>
-                  <td className="text-white">{item.dept}</td>
+                  <td className="text-gray-900">{item.dept}</td>
                   <td className="text-right font-mono">{IDR(item.stdCost)}</td>
                   <td className="text-right font-mono">{IDR(item.actCost)}</td>
                   <td className="text-right"><VarAmount amount={-item.rateVar} /></td>
@@ -251,8 +251,8 @@ function BatchVarianceDetail({ result, onClose }) {
               ))}
               <tr className="font-black">
                 <td>Total DL</td>
-                <td className="text-right font-mono text-blue-400">{IDR(dl.totalStd)}</td>
-                <td className="text-right font-mono text-white">{IDR(dl.totalActual)}</td>
+                <td className="text-right font-mono text-blue-700">{IDR(dl.totalStd)}</td>
+                <td className="text-right font-mono text-gray-900">{IDR(dl.totalActual)}</td>
                 <td /><td />
                 <td className="text-right"><VarAmount amount={-dl.totalVar} /></td>
               </tr>
@@ -262,7 +262,7 @@ function BatchVarianceDetail({ result, onClose }) {
 
         {/* FOH Section */}
         <div>
-          <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+          <h4 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
             🏭 Factory Overhead (Standar Rate)
             <span className="text-xs font-normal text-gray-500">Tarif × Aktual Output</span>
           </h4>
@@ -270,8 +270,8 @@ function BatchVarianceDetail({ result, onClose }) {
             <thead><tr><th>Item</th><th className="text-right">Standar</th><th className="text-right">Aktual</th><th className="text-right">Varians</th></tr></thead>
             <tbody>
               <tr>
-                <td className="text-white">Factory Overhead</td>
-                <td className="text-right font-mono text-blue-400">{IDR(foh.std)}</td>
+                <td className="text-gray-900">Factory Overhead</td>
+                <td className="text-right font-mono text-blue-700">{IDR(foh.std)}</td>
                 <td className="text-right font-mono">{IDR(foh.actual)}</td>
                 <td className="text-right"><VarAmount amount={-foh.var} /></td>
               </tr>
@@ -285,7 +285,7 @@ function BatchVarianceDetail({ result, onClose }) {
         {/* Journal entry suggestion */}
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
           <p className="text-xs font-bold text-blue-300 mb-2">📒 Jurnal Penyesuaian Varians (Akhir Bulan)</p>
-          <div className="font-mono text-xs space-y-1 text-gray-300">
+          <div className="font-mono text-xs space-y-1 text-gray-700">
             {totals.var > 0 ? (
               <>
                 <div>Dr. Variance — Unfavorable &nbsp;&nbsp;{IDR(Math.abs(totals.var))}</div>
@@ -335,29 +335,29 @@ export default function Costing() {
       <PageHeader title="Biaya Produksi (Semi-Actual)" subtitle="DM: Aktual · DL & FOH: Standar · Rekonsiliasi Akhir Bulan" />
 
       <div className="mb-4 p-3 rounded-xl text-xs" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-        <p className="font-bold text-white mb-1.5">Metode Semi-Actual Costing</p>
+        <p className="font-bold text-gray-900 mb-1.5">Metode Semi-Actual Costing</p>
         <div className="grid grid-cols-3 gap-3 text-gray-400">
-          <div><span className="text-green-400 font-bold">DM (Bahan Baku):</span> Kuantitas aktual × harga aktual = BIAYA AKTUAL</div>
-          <div><span className="text-blue-400 font-bold">DL (Tenaga Kerja):</span> Jam aktual × tarif standar = STANDAR DITERAPKAN</div>
-          <div><span className="text-amber-400 font-bold">FOH (Overhead):</span> Tarif standar × output aktual = STANDAR DITERAPKAN</div>
+          <div><span className="text-green-700 font-bold">DM (Bahan Baku):</span> Kuantitas aktual × harga aktual = BIAYA AKTUAL</div>
+          <div><span className="text-blue-700 font-bold">DL (Tenaga Kerja):</span> Jam aktual × tarif standar = STANDAR DITERAPKAN</div>
+          <div><span className="text-amber-700 font-bold">FOH (Overhead):</span> Tarif standar × output aktual = STANDAR DITERAPKAN</div>
         </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <KPICard label="Total Biaya Standar"  sublabel="Standard Cost"   value={IDR(totalStd)}    color="text-blue-400"  icon="📋" />
-        <KPICard label="Total Biaya Aktual"   sublabel="Actual Cost"     value={IDR(totalActual)} color="text-white"     icon="💸" />
+        <KPICard label="Total Biaya Standar"  sublabel="Standard Cost"   value={IDR(totalStd)}    color="text-blue-700"  icon="📋" />
+        <KPICard label="Total Biaya Aktual"   sublabel="Actual Cost"     value={IDR(totalActual)} color="text-gray-900"     icon="💸" />
         <KPICard label="Total Varians"        sublabel="Total Variance"  value={IDR(Math.abs(totalVar))}
-          color={totalVar > 0 ? "text-red-400" : "text-green-400"} icon={totalVar > 0 ? "⚠️" : "✅"}
+          color={totalVar > 0 ? "text-red-700" : "text-green-700"} icon={totalVar > 0 ? "⚠️" : "✅"}
           sub={totalVar > 0 ? "Unfavorable (lebih mahal)" : "Favorable (lebih hemat)"} />
         <KPICard label="Batch Selesai"        sublabel="Completed"       value={BATCHES.filter(b=>b.status==="completed").length} icon="🏭" />
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-5 border-b border-gray-800 pb-0">
+      <div className="flex gap-2 mb-5 border-b border-gray-200 pb-0">
         {[["batches","🏭 Batch Produksi"],["standards","📋 Kartu Biaya Standar"],["variance","📊 Ringkasan Varians"]].map(([k,l])=>(
           <button key={k} onClick={()=>setTab(k)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${tab===k?"border-yellow-400 text-white":"border-transparent text-gray-500 hover:text-gray-300"}`}>
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${tab===k?"border-yellow-400 text-gray-900":"border-transparent text-gray-500 hover:text-gray-700"}`}>
             {l}
           </button>
         ))}
@@ -377,19 +377,19 @@ export default function Costing() {
             <tbody>
               {allResults.map(r => (
                 <tr key={r.batch.id}>
-                  <td className="font-mono text-blue-400 text-xs">{r.batch.id}</td>
+                  <td className="font-mono text-blue-700 text-xs">{r.batch.id}</td>
                   <td className="text-xs">{r.batch.date}</td>
-                  <td className="font-medium text-white">{r.batch.product_name}</td>
+                  <td className="font-medium text-gray-900">{r.batch.product_name}</td>
                   <td className="text-right font-mono">{NUM(r.qty)} lbr</td>
-                  <td className="text-right font-mono text-blue-400 text-xs">{IDR(r.totals.std)}</td>
+                  <td className="text-right font-mono text-blue-700 text-xs">{IDR(r.totals.std)}</td>
                   <td className="text-right font-mono text-xs">{IDR(r.totals.actual)}</td>
                   <td className="text-right">
-                    <span className={`text-xs font-bold ${r.totals.var > 0 ? "text-red-400" : "text-green-400"}`}>
+                    <span className={`text-xs font-bold ${r.totals.var > 0 ? "text-red-700" : "text-green-700"}`}>
                       {r.totals.var >= 0 ? "+" : ""}{IDR(r.totals.var)}
                       <span className="ml-1 opacity-70">{r.totals.var > 0 ? "U" : "F"}</span>
                     </span>
                   </td>
-                  <td><span className="text-xs text-green-400">✅ Selesai</span></td>
+                  <td><span className="text-xs text-green-700">✅ Selesai</span></td>
                   <td>
                     <Btn size="xs" variant="ghost" onClick={() => setSelectedBatch(r.batch)}>
                       📊 Analisis
@@ -417,7 +417,7 @@ export default function Costing() {
                 <div className="grid md:grid-cols-3 gap-4 mt-3">
                   {/* DM */}
                   <div>
-                    <p className="text-xs font-bold text-green-400 uppercase tracking-wider mb-2">🪵 Direct Materials</p>
+                    <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">🪵 Direct Materials</p>
                     <table className="erp-table text-xs">
                       <thead><tr><th>Material</th><th>Std Qty</th><th className="text-right">Biaya/batch</th></tr></thead>
                       <tbody>
@@ -434,7 +434,7 @@ export default function Costing() {
                   </div>
                   {/* DL */}
                   <div>
-                    <p className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">👷 Direct Labor</p>
+                    <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">👷 Direct Labor</p>
                     <table className="erp-table text-xs">
                       <thead><tr><th>Departemen</th><th>Jam</th><th className="text-right">Biaya</th></tr></thead>
                       <tbody>
@@ -451,13 +451,13 @@ export default function Costing() {
                   </div>
                   {/* FOH + Summary */}
                   <div>
-                    <p className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">🏭 Overhead Pabrik</p>
+                    <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">🏭 Overhead Pabrik</p>
                     <div className="erp-card p-3 text-sm space-y-2">
                       <div className="flex justify-between"><span className="text-gray-400">Tarif/lembar</span><span className="font-mono">{IDR(sc.foh_rate_per_sheet)}</span></div>
-                      <div className="flex justify-between"><span className="text-gray-400">Total FOH/batch</span><span className="font-mono text-amber-400">{IDR(totalFOH)}</span></div>
-                      <div className="border-t border-gray-700 pt-2">
-                        <div className="flex justify-between"><span className="font-bold">Total Cost/batch</span><span className="font-black text-white">{IDR(totalCost)}</span></div>
-                        <div className="flex justify-between mt-1"><span className="text-gray-400">Per lembar</span><span className="font-bold text-green-400">{IDR(costPerUnit)}</span></div>
+                      <div className="flex justify-between"><span className="text-gray-400">Total FOH/batch</span><span className="font-mono text-amber-700">{IDR(totalFOH)}</span></div>
+                      <div className="border-t border-gray-200 pt-2">
+                        <div className="flex justify-between"><span className="font-bold">Total Cost/batch</span><span className="font-black text-gray-900">{IDR(totalCost)}</span></div>
+                        <div className="flex justify-between mt-1"><span className="text-gray-400">Per lembar</span><span className="font-bold text-green-700">{IDR(costPerUnit)}</span></div>
                       </div>
                     </div>
                     {/* Cost breakdown donut-like bar */}
@@ -465,7 +465,7 @@ export default function Costing() {
                       {[["DM",totalDMStd,"bg-green-500"],["DL",totalDLStd,"bg-blue-500"],["FOH",totalFOH,"bg-amber-500"]].map(([l,v,c])=>(
                         <div key={l} className="flex items-center gap-2">
                           <span className="w-8 text-gray-500">{l}</span>
-                          <div className="flex-1 h-2 rounded-full bg-gray-800">
+                          <div className="flex-1 h-2 rounded-full bg-gray-100">
                             <div className={`h-2 rounded-full ${c}`} style={{width:`${Math.round(v/totalCost*100)}%`}} />
                           </div>
                           <span className="text-gray-400 w-8 text-right">{Math.round(v/totalCost*100)}%</span>
@@ -506,30 +506,30 @@ export default function Costing() {
               <tbody>
                 {allResults.map(r => (
                   <tr key={r.batch.id}>
-                    <td className="font-mono text-xs text-blue-400">{r.batch.id}</td>
-                    <td className="text-white">{r.batch.product_name}</td>
+                    <td className="font-mono text-xs text-blue-700">{r.batch.id}</td>
+                    <td className="text-gray-900">{r.batch.product_name}</td>
                     <td className="text-right"><VarAmount amount={-r.dm.totalVar} /></td>
                     <td className="text-right"><VarAmount amount={-r.dl.totalVar} /></td>
                     <td className="text-right"><VarAmount amount={-r.foh.var} /></td>
                     <td className="text-right">
-                      <span className={`font-black text-sm ${r.totals.var > 0 ? "text-red-400" : "text-green-400"}`}>
+                      <span className={`font-black text-sm ${r.totals.var > 0 ? "text-red-700" : "text-green-700"}`}>
                         {IDR(Math.abs(r.totals.var))} {r.totals.var > 0 ? "U" : "F"}
                       </span>
                     </td>
                     <td className="text-right">
-                      <span className={`text-xs ${Math.abs(r.totals.var / r.totals.std) > 0.05 ? "text-red-400" : "text-green-400"}`}>
+                      <span className={`text-xs ${Math.abs(r.totals.var / r.totals.std) > 0.05 ? "text-red-700" : "text-green-700"}`}>
                         {PCT(Math.abs(r.totals.var / r.totals.std) * 100)}
                       </span>
                     </td>
                   </tr>
                 ))}
-                <tr className="font-black border-t-2 border-gray-700">
+                <tr className="font-black border-t-2 border-gray-200">
                   <td colSpan={2}>TOTAL</td>
                   <td className="text-right"><VarAmount amount={-allResults.reduce((s,r)=>s+r.dm.totalVar,0)} /></td>
                   <td className="text-right"><VarAmount amount={-allResults.reduce((s,r)=>s+r.dl.totalVar,0)} /></td>
                   <td className="text-right"><VarAmount amount={-allResults.reduce((s,r)=>s+r.foh.var,0)} /></td>
                   <td className="text-right">
-                    <span className={`font-black ${totalVar > 0 ? "text-red-400" : "text-green-400"}`}>
+                    <span className={`font-black ${totalVar > 0 ? "text-red-700" : "text-green-700"}`}>
                       {IDR(Math.abs(totalVar))} {totalVar > 0 ? "U" : "F"}
                     </span>
                   </td>
@@ -539,7 +539,7 @@ export default function Costing() {
                 </tr>
               </tbody>
             </table>
-            <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-800">
+            <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-200">
               <Btn variant="secondary">📤 Export Variance Report</Btn>
               <Btn onClick={() => toast("✅ Jurnal varians bulan ini berhasil dicatat")}>
                 📒 Catat Semua Jurnal Varians

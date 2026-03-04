@@ -3,11 +3,11 @@ import { PageHeader, Card, Btn, SearchBar, Table } from "../../components/ui";
 import { ACCOUNTS } from "../../data/seed";
 
 const TYPE_COLORS = {
-  asset:     "bg-blue-500/20 text-blue-400",
-  liability: "bg-red-500/20 text-red-400",
-  equity:    "bg-purple-500/20 text-purple-400",
-  revenue:   "bg-green-500/20 text-green-400",
-  expense:   "bg-amber-500/20 text-amber-400",
+  asset:     "bg-blue-500/20 text-blue-700",
+  liability: "bg-red-500/20 text-red-700",
+  equity:    "bg-purple-500/20 text-purple-700",
+  revenue:   "bg-green-500/20 text-green-700",
+  expense:   "bg-amber-500/20 text-amber-700",
 };
 
 export default function ChartOfAccounts() {
@@ -30,16 +30,16 @@ export default function ChartOfAccounts() {
           <div className="flex gap-1.5 flex-wrap">
             {TYPES.map(t=>(
               <button key={t} onClick={()=>setTypeFilter(t)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium capitalize transition-colors ${typeFilter===t?"bg-blue-600 text-white":"bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium capitalize transition-colors ${typeFilter===t?"bg-blue-600 text-white":"bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
                 {t}
               </button>
             ))}
           </div>
         </div>
         <Table columns={[
-          { key:"code",      label:"Code",    render:v=><span className="font-mono font-bold text-blue-400">{v}</span> },
+          { key:"code",      label:"Code",    render:v=><span className="font-mono font-bold text-blue-700">{v}</span> },
           { key:"name",      label:"Account Name", render:(v,r)=>(
-            <span className={r.is_header?"font-black text-white uppercase text-xs tracking-wider":""}>{v}</span>
+            <span className={r.is_header?"font-black text-gray-900 uppercase text-xs tracking-wider":""}>{v}</span>
           )},
           { key:"type",      label:"Type",    render:v=>(
             <span className={`text-xs px-2 py-0.5 rounded font-medium capitalize ${TYPE_COLORS[v]}`}>{v}</span>
